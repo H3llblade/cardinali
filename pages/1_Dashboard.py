@@ -2,22 +2,28 @@ import streamlit as st
 import time
 from gestionale import formatta, aggiorna_dati_da_github
 
-# Auto refresh ogni 5 secondi
+# =========================
+# AUTO REFRESH (senza librerie)
+# =========================
 if "last_refresh" not in st.session_state:
     st.session_state.last_refresh = time.time()
 
+# ogni 5 secondi aggiorna
 if time.time() - st.session_state.last_refresh > 5:
     st.session_state.last_refresh = time.time()
     st.rerun()
 
-# Ricarica i dati da GitHub / sorgente centrale
+# =========================
+# CARICAMENTO DATI
+# =========================
 aggiorna_dati_da_github()
 
-# Recupera i dati aggiornati
 finanze = st.session_state.get("finanze", {})
 coca = st.session_state.get("coca", {})
 
-# Titolo pagina
+# =========================
+# UI
+# =========================
 st.markdown(
     "<h1 style='text-align:center; color:white;'>🦅 CARDINALI</h1>",
     unsafe_allow_html=True
@@ -29,61 +35,17 @@ st.divider()
 # REGISTRO FINANZE
 # =========================
 st.markdown(
-    "<h2 style='text-align:left; color:white;'>💰 Registro Finanze</h2>",
+    "<h2 style='color:white;'>💰 Registro Finanze</h2>",
     unsafe_allow_html=True
 )
 
 st.divider()
 
-col1, col2, col3 = st.columns(3, gap="large")
+col1, col2, col3 = st.columns(3)
 
-with col1:
-    st.markdown(
-        f"""
-        <div style='background-color:#1E1E1E;
-                    color:white;
-                    padding:30px;
-                    border-radius:15px;
-                    text-align:center;
-                    box-shadow:0 4px 10px rgba(0,0,0,0.3);'>
-            <h3>💰 Cassa</h3>
-            <h2>{formatta(finanze.get('cassa', 0))} $</h2>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-with col2:
-    st.markdown(
-        f"""
-        <div style='background-color:#1E1E1E;
-                    color:white;
-                    padding:30px;
-                    border-radius:15px;
-                    text-align:center;
-                    box-shadow:0 4px 10px rgba(0,0,0,0.3);'>
-            <h3>💸 Soldi Sporchi</h3>
-            <h2>{formatta(finanze.get('soldi_sporchi', 0))} $</h2>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-with col3:
-    st.markdown(
-        f"""
-        <div style='background-color:#1E1E1E;
-                    color:white;
-                    padding:30px;
-                    border-radius:15px;
-                    text-align:center;
-                    box-shadow:0 4px 10px rgba(0,0,0,0.3);'>
-            <h3>💼 Fondo Cassa</h3>
-            <h2>{formatta(finanze.get('fondo_cassa', 0))} $</h2>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+col1.metric("💰 Cassa", f"{formatta(finanze.get('cassa', 0))} $")
+col2.metric("💸 Soldi Sporchi", f"{formatta(finanze.get('soldi_sporchi', 0))} $")
+col3.metric("💼 Fondo Cassa", f"{formatta(finanze.get('fondo_cassa', 0))} $")
 
 st.divider()
 
@@ -91,65 +53,21 @@ st.divider()
 # PROCESSO COCA
 # =========================
 st.markdown(
-    "<h2 style='text-align:left; color:white;'>🌿 Processo Coca</h2>",
+    "<h2 style='color:white;'>🌿 Processo Coca</h2>",
     unsafe_allow_html=True
 )
 
 st.divider()
 
-col4, col5, col6 = st.columns(3, gap="large")
+col4, col5, col6 = st.columns(3)
 
-with col4:
-    st.markdown(
-        f"""
-        <div style='background-color:#2A2A2A;
-                    color:white;
-                    padding:30px;
-                    border-radius:15px;
-                    text-align:center;
-                    box-shadow:0 4px 10px rgba(0,0,0,0.3);'>
-            <h3>🍃 Foglie</h3>
-            <h2>{formatta(coca.get('foglie', 0))}</h2>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-with col5:
-    st.markdown(
-        f"""
-        <div style='background-color:#2A2A2A;
-                    color:white;
-                    padding:30px;
-                    border-radius:15px;
-                    text-align:center;
-                    box-shadow:0 4px 10px rgba(0,0,0,0.3);'>
-            <h3>🧱 Panetti</h3>
-            <h2>{formatta(coca.get('panetti', 0))}</h2>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-with col6:
-    st.markdown(
-        f"""
-        <div style='background-color:#2A2A2A;
-                    color:white;
-                    padding:30px;
-                    border-radius:15px;
-                    text-align:center;
-                    box-shadow:0 4px 10px rgba(0,0,0,0.3);'>
-            <h3>💊 Bustine</h3>
-            <h2>{formatta(coca.get('bustine', 0))}</h2>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+col4.metric("🍃 Foglie", formatta(coca.get("foglie", 0)))
+col5.metric("🧱 Panetti", formatta(coca.get("panetti", 0)))
+col6.metric("💊 Bustine", formatta(coca.get("bustine", 0)))
 
 st.divider()
 
-# Pulsante manuale opzionale
+# refresh manuale
 if st.button("🔄 Aggiorna ora"):
     aggiorna_dati_da_github()
     st.rerun()
