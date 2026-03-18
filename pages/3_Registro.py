@@ -16,3 +16,16 @@ if movimenti:
         )
 else:
     st.info("Nessun movimento registrato")
+    def reset_registro():
+    if st.button("🗑️ Svuota Registro"):
+        st.session_state.dati = {
+            "cassa": 0,
+            "fondo_cassa": 0,
+            "soldi_sporchi": 0,
+            "movimenti": []
+        }
+        aggiorna_file_github(st.session_state.dati)
+        st.success("Registro svuotato correttamente!")
+
+# 👇 DOPO la definizione
+reset_registro()
