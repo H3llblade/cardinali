@@ -4,9 +4,15 @@ from gestionale import st, formatta
 dati = st.session_state.get("dati", {})
 
 # ===============================
+# TITOLO PRINCIPALE: CARDINALI
+# ===============================
+st.markdown("<h1 style='text-align:center;color:white;'>🦅 CARDINALI</h1>", unsafe_allow_html=True)
+st.divider()
+
+# ===============================
 # PRIMO TITOLO: REGISTRO FINANZE
 # ===============================
-st.markdown("<h1 style='text-align:center;color:white;'>💰 Registro Finanze</h1>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align:left;color:white;'>💰 Registro Finanze</h2>", unsafe_allow_html=True)
 st.divider()
 
 # TRE CONTATORI PRINCIPALI IN BOX COLORATI
@@ -35,7 +41,7 @@ st.divider()
 # ===============================
 # SECONDO TITOLO: PROCESSO COCA
 # ===============================
-st.markdown("<h1 style='text-align:center;color:white;'>🌿 Processo Coca</h1>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align:left;color:white;'>🌿 Processo Coca</h2>", unsafe_allow_html=True)
 st.divider()
 
 # TRE CONTATORI DEL PROCESSO COCA IN BOX
