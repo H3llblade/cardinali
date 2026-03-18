@@ -1,32 +1,29 @@
 import streamlit as st
-from gestionale import st, formatta
+import pandas as pd
+from gestionale import formatta, aggiorna_file_github
 
-st.title("📂 Registro Completo Movimenti")
-movimenti = st.session_state.get("dati", {}).get("movimenti", [])
+st.title("📂 Registro Movimenti")
+st.divider()
+
+finanze = st.session_state.get("finanze", {})
+movimenti = finanze.get("movimenti", [])
 
 if movimenti:
-    for mov in reversed(movimenti):
-        st.markdown(
-            f"<div style='background-color:#2C2C2C;padding:10px;border-radius:10px;margin-bottom:5px;'>"
-            f"<b>🕒 {mov['data']}</b> | "
-            f"📂 {mov['tipo']} | "
-            f"📝 {mov['causale']} | "
-            f"💰 {formatta(mov['valore'])} $"
-            f"</div>", unsafe_allow_html=True
+    df = pd.DataFrame(movimenti)
+    df = df.iloc[::-1].reset_index(drop=True)
+
+    st.dataframe(df, use_container_width=True)
+
+    st.divider()
+
+    if st.button("🗑️ Reset Registro"):
+        st.session_state.finanze["movimenti"] = []
+        aggiorna_file_github(
+            "data/finanze.json",
+            st.session_state.finanze,
+            "Reset registro movimenti"
         )
+        st.success("Registro resettato correttamente.")
+        st.rerun()
 else:
-    st.info("Nessun movimento registrato")
-
-def reset_registro():
-    if st.button("🗑️ Svuota Registro"):
-        st.session_state.dati = {
-            "cassa": 0,
-            "fondo_cassa": 0,
-            "soldi_sporchi": 0,
-            "movimenti": []
-        }
-        aggiorna_file_github(st.session_state.dati)
-        st.success("Registro svuotato correttamente!")
-
-# 👇 DOPO la definizione
-reset_registro()
+    st.info("Nessun movimento registrato.")
