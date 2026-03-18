@@ -1,28 +1,16 @@
-# discord_utils.py
 import requests
 from datetime import datetime
 import streamlit as st
 
-# Recupera il webhook dal secrets di Streamlit
-WEBHOOK_URL = st.secrets.get("DISCORD_WEBHOOK_URL")  # Inserisci qui il tuo webhook
+WEBHOOK_URL = st.secrets.get("DISCORD_WEBHOOK_URL")  # Webhook Discord
 
 def invia_discord(tipo: str, causale: str, valore: float, totale: float):
-    """
-    Invia un messaggio su Discord per i movimenti finanziari.
-    
-    Parametri:
-    - tipo: "cassa", "soldi_sporchi" o "fondo_cassa"
-    - causale: descrizione del movimento
-    - valore: importo del movimento
-    - totale: totale aggiornato della sezione
-    """
+    """Invia messaggi su Discord per movimenti finanziari."""
     if not WEBHOOK_URL:
         st.warning("Webhook Discord non impostato!")
         return
     
-    # Emoji per rendere il messaggio più leggibile
     emoji_tipo = "💰" if tipo == "cassa" else "💸" if tipo == "soldi_sporchi" else "💼"
-    
     msg = (
         f"{emoji_tipo} **{tipo.upper()} registrato!**\n"
         f"📝 Causale: {causale}\n"
