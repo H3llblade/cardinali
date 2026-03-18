@@ -1,5 +1,5 @@
 import streamlit as st
-from gestionale import st, formatta
+from _gestionale import st, formatta
 
 dati = st.session_state.get("dati", {})
 
