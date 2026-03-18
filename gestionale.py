@@ -13,7 +13,7 @@ st.set_page_config(layout="wide", page_title="Gestionale", page_icon="💻")
 # -------------------------------
 GITHUB_REPO_OWNER = st.secrets["GITHUB_OWNER"]
 GITHUB_REPO_NAME  = st.secrets["GITHUB_REPO"]
-GITHUB_FILE_PATH  = "finanze.json"
+GITHUB_FILE_PATH  = "data/finanze.json"
 GITHUB_TOKEN      = st.secrets["GITHUB_PAT"]
 
 GITHUB_API_URL = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/{GITHUB_FILE_PATH}"
