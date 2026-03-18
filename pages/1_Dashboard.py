@@ -1,9 +1,14 @@
 import streamlit as st
-from streamlit_autorefresh import st_autorefresh
+import time
 from gestionale import formatta, aggiorna_dati_da_github
 
-# Aggiorna automaticamente la pagina ogni 5 secondi
-st_autorefresh(interval=5000, key="dashboard_autorefresh")
+# Auto refresh ogni 5 secondi
+if "last_refresh" not in st.session_state:
+    st.session_state.last_refresh = time.time()
+
+if time.time() - st.session_state.last_refresh > 5:
+    st.session_state.last_refresh = time.time()
+    st.rerun()
 
 # Ricarica i dati da GitHub / sorgente centrale
 aggiorna_dati_da_github()
