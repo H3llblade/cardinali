@@ -3,27 +3,13 @@ from gestionale import st, formatta
 
 dati = st.session_state.get("dati", {})
 
-st.title("📊 Dashboard")
-
-# REGISTRO FINANZIARIO AL CENTRO
-st.subheader("📋 Registro Finanziario")
-movimenti = dati.get("movimenti", [])
-if movimenti:
-    for mov in reversed(movimenti[-10:]):  # ultimi 10 movimenti
-        st.markdown(
-            f"<div style='background-color:#2C2C2C;padding:15px;border-radius:10px;margin-bottom:10px;'>"
-            f"<b>🕒 {mov['data']}</b><br>"
-            f"📂 <b>{mov['tipo']}</b><br>"
-            f"📝 {mov['causale']}<br>"
-            f"💰 Importo: {formatta(mov['valore'])} $"
-            f"</div>", unsafe_allow_html=True
-        )
-else:
-    st.info("Nessun movimento registrato")
-
+# ===============================
+# PRIMO TITOLO: REGISTRO FINANZE
+# ===============================
+st.markdown("<h1 style='text-align:center;color:white;'>💰 Registro Finanze</h1>", unsafe_allow_html=True)
 st.divider()
 
-# TRE CONTATORI SOTTO IL REGISTRO
+# TRE CONTATORI PRINCIPALI
 col1, col2, col3 = st.columns(3, gap="large")
 with col1:
     st.metric("💰 Cassa", dati.get("cassa",0))
@@ -34,8 +20,13 @@ with col3:
 
 st.divider()
 
-# SEZIONE PROCESSO COCA
-st.subheader("🌿 Processo Coca")
+# ===============================
+# SECONDO TITOLO: PROCESSO COCA
+# ===============================
+st.markdown("<h1 style='text-align:center;color:white;'>🌿 Processo Coca</h1>", unsafe_allow_html=True)
+st.divider()
+
+# TRE CONTATORI DEL PROCESSO COCA
 col1, col2, col3 = st.columns(3, gap="large")
 with col1:
     st.metric("🍃 Foglie", dati.get("foglie",0))
