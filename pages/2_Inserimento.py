@@ -15,6 +15,8 @@ with col1:
             registra_movimento("cassa", cassa_causale, cassa_valore)
             st.success(f"Cassa aggiornata di {cassa_valore}")
             st.rerun()
+        else:
+            st.warning("Inserisci una causale per la cassa.")
 
 with col2:
     st.subheader("💸 Soldi Sporchi")
@@ -25,6 +27,8 @@ with col2:
             registra_movimento("soldi_sporchi", ss_causale, ss_valore)
             st.success(f"Soldi Sporchi aggiornati di {ss_valore}")
             st.rerun()
+        else:
+            st.warning("Inserisci una causale per i soldi sporchi.")
 
 with col3:
     st.subheader("💼 Fondo Cassa")
@@ -35,29 +39,30 @@ with col3:
             registra_movimento("fondo_cassa", fc_causale, fc_valore)
             st.success(f"Fondo Cassa aggiornato di {fc_valore}")
             st.rerun()
+        else:
+            st.warning("Inserisci una causale per il fondo cassa.")
 
 st.divider()
 
-col1, col2, col3 = st.columns(3, gap="large")
+st.subheader("🌿 Processo Coca")
 
-with col1:
-    st.subheader("🍃 Foglie")
+col4, col5, col6 = st.columns(3, gap="large")
+
+with col4:
     foglie_valore = st.number_input("Valore Foglie", value=0.0, key="foglie_valore")
     if st.button("Registra Foglie", key="btn_foglie"):
         registra_coca("foglie", foglie_valore)
         st.success(f"Foglie aggiornate di {foglie_valore}")
         st.rerun()
 
-with col2:
-    st.subheader("🧱 Panetti")
+with col5:
     panetti_valore = st.number_input("Valore Panetti", value=0.0, key="panetti_valore")
     if st.button("Registra Panetti", key="btn_panetti"):
         registra_coca("panetti", panetti_valore)
         st.success(f"Panetti aggiornati di {panetti_valore}")
         st.rerun()
 
-with col3:
-    st.subheader("💊 Bustine")
+with col6:
     bustine_valore = st.number_input("Valore Bustine", value=0.0, key="bustine_valore")
     if st.button("Registra Bustine", key="btn_bustine"):
         registra_coca("bustine", bustine_valore)
