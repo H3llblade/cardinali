@@ -16,7 +16,8 @@ if movimenti:
         )
 else:
     st.info("Nessun movimento registrato")
-    def reset_registro():
+
+def reset_registro():
     if st.button("🗑️ Svuota Registro"):
         st.session_state.dati = {
             "cassa": 0,
