@@ -4,7 +4,9 @@ from gestionale import registra_movimento
 st.title("📝 Inserimento Movimenti")
 st.divider()
 
-# Tre colonne per inserimento diretto
+# ===============================
+# PRIMA RIGA: FINANZE
+# ===============================
 col1, col2, col3 = st.columns(3, gap="large")
 
 # -------- COLONNA 1: CASSA --------
@@ -44,4 +46,50 @@ with col3:
             st.success(f"Fondo Cassa aggiornato di {fc_valore}")
             st.session_state.fc_causale = ""
             st.session_state.fc_valore = 0.0
+            st.experimental_rerun()
+
+st.divider()
+
+# ===============================
+# SECONDA RIGA: PROCESSO COCA
+# ===============================
+col1, col2, col3 = st.columns(3, gap="large")
+
+# -------- COLONNA 1: FOGLIE --------
+with col1:
+    st.subheader("🍃 Foglie")
+    foglie_causale = st.text_input("Causale Foglie", key="foglie_causale")
+    foglie_valore = st.number_input("Valore Foglie", value=0.0, key="foglie_valore")
+    if st.button("Registra Foglie", key="btn_foglie"):
+        if foglie_causale.strip():
+            registra_movimento("foglie", foglie_causale, foglie_valore)
+            st.success(f"Foglie aggiornate di {foglie_valore}")
+            st.session_state.foglie_causale = ""
+            st.session_state.foglie_valore = 0.0
+            st.experimental_rerun()
+
+# -------- COLONNA 2: PANETTI --------
+with col2:
+    st.subheader("🧱 Panetti")
+    panetti_causale = st.text_input("Causale Panetti", key="panetti_causale")
+    panetti_valore = st.number_input("Valore Panetti", value=0.0, key="panetti_valore")
+    if st.button("Registra Panetti", key="btn_panetti"):
+        if panetti_causale.strip():
+            registra_movimento("panetti", panetti_causale, panetti_valore)
+            st.success(f"Panetti aggiornati di {panetti_valore}")
+            st.session_state.panetti_causale = ""
+            st.session_state.panetti_valore = 0.0
+            st.experimental_rerun()
+
+# -------- COLONNA 3: BUSTINE --------
+with col3:
+    st.subheader("💊 Bustine")
+    bustine_causale = st.text_input("Causale Bustine", key="bustine_causale")
+    bustine_valore = st.number_input("Valore Bustine", value=0.0, key="bustine_valore")
+    if st.button("Registra Bustine", key="btn_bustine"):
+        if bustine_causale.strip():
+            registra_movimento("bustine", bustine_causale, bustine_valore)
+            st.success(f"Bustine aggiornate di {bustine_valore}")
+            st.session_state.bustine_causale = ""
+            st.session_state.bustine_valore = 0.0
             st.experimental_rerun()
