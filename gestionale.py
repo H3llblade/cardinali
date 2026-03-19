@@ -4,7 +4,13 @@ import requests
 import json
 import base64
 
-st.set_page_config(layout="wide", page_title="CARDINALI", page_icon="🦅")
+# =========================
+# CONFIG PAGINA
+# =========================
+try:
+    st.set_page_config(layout="wide", page_title="CARDINALI", page_icon="🦅")
+except Exception:
+    pass
 
 # =========================
 # CONFIG GITHUB
@@ -19,7 +25,7 @@ HEADERS = {
 }
 
 FINANZE_FILE = "data/finanze.json"
-COCA_FILE = "data/processo_coca.json"
+DEPOSITO_FILE = "data/deposito.json"
 
 # =========================
 # CONFIG DISCORD
@@ -36,12 +42,9 @@ DEFAULT_FINANZE = {
     "movimenti": []
 }
 
-DEFAULT_COCA = {
-    "foglie": 0,
-    "panetti": 0,
-    "bustine": 0
+DEFAULT_DEPOSITO = {
+    "items": {}
 }
-
 
 # =========================
 # FUNZIONI GITHUB
@@ -59,8 +62,7 @@ def leggi_file_github(file_path, default_data):
 
         return default_data.copy()
 
-    except Exception as e:
-        st.error(f"Errore lettura GitHub ({file_path}): {e}")
+    except Exception:
         return default_data.copy()
 
 
@@ -85,10 +87,10 @@ def aggiorna_file_github(file_path, dati, messaggio_commit):
         put_r = requests.put(url, headers=HEADERS, json=payload, timeout=15)
 
         if put_r.status_code not in [200, 201]:
-            st.error(f"Errore aggiornamento GitHub: {put_r.text}")
+            raise Exception(f"GitHub API error: {put_r.status_code} - {put_r.text}")
 
     except Exception as e:
-        st.error(f"Errore scrittura GitHub ({file_path}): {e}")
+        st.error(f"Errore aggiornamento GitHub su {file_path}: {e}")
 
 
 # =========================
@@ -96,16 +98,15 @@ def aggiorna_file_github(file_path, dati, messaggio_commit):
 # =========================
 def carica_dati():
     st.session_state.finanze = leggi_file_github(FINANZE_FILE, DEFAULT_FINANZE)
-    st.session_state.coca = leggi_file_github(COCA_FILE, DEFAULT_COCA)
+    st.session_state.deposito = leggi_file_github(DEPOSITO_FILE, DEFAULT_DEPOSITO)
 
 
 def aggiorna_dati_da_github():
     carica_dati()
 
 
-if "finanze" not in st.session_state or "coca" not in st.session_state:
+if "finanze" not in st.session_state or "deposito" not in st.session_state:
     carica_dati()
-
 
 # =========================
 # UTILS
@@ -141,17 +142,17 @@ def invia_discord(tipo, causale, valore, totale):
 def registra_movimento(tipo, causale, valore):
     if tipo not in ["cassa", "soldi_sporchi", "fondo_cassa"]:
         st.error(f"Tipo non valido: {tipo}")
-        return
+        return False
 
     try:
         valore = float(valore)
     except Exception:
         st.error("Valore non valido.")
-        return
+        return False
 
     finanze = st.session_state.get("finanze", DEFAULT_FINANZE.copy())
 
-    if "movimenti" not in finanze:
+    if "movimenti" not in finanze or not isinstance(finanze["movimenti"], list):
         finanze["movimenti"] = []
 
     if tipo not in finanze:
@@ -174,32 +175,49 @@ def registra_movimento(tipo, causale, valore):
     )
 
     invia_discord(tipo, causale, valore, finanze[tipo])
+    return True
 
 
 # =========================
-# PROCESSO COCA
+# DEPOSITO DINAMICO
 # =========================
-def registra_coca(tipo, valore):
-    if tipo not in ["foglie", "panetti", "bustine"]:
-        st.error(f"Tipo coca non valido: {tipo}")
-        return
-
+def registra_deposito(nome_articolo, quantita):
     try:
-        valore = float(valore)
+        nome_articolo = str(nome_articolo).strip().lower()
+        quantita = float(quantita)
     except Exception:
-        st.error("Valore non valido.")
-        return
+        st.error("Nome articolo o quantità non validi.")
+        return False
 
-    coca = st.session_state.get("coca", DEFAULT_COCA.copy())
+    if not nome_articolo:
+        st.error("Inserisci un nome articolo valido.")
+        return False
 
-    if tipo not in coca:
-        coca[tipo] = 0
+    deposito = st.session_state.get("deposito", DEFAULT_DEPOSITO.copy())
 
-    coca[tipo] += valore
-    st.session_state.coca = coca
+    if "items" not in deposito or not isinstance(deposito["items"], dict):
+        deposito["items"] = {}
+
+    if nome_articolo not in deposito["items"]:
+        deposito["items"][nome_articolo] = 0
+
+    deposito["items"][nome_articolo] += quantita
+    st.session_state.deposito = deposito
 
     aggiorna_file_github(
-        COCA_FILE,
-        coca,
-        f"Aggiornamento processo coca: {tipo}"
+        DEPOSITO_FILE,
+        deposito,
+        f"Aggiornamento deposito: {nome_articolo}"
     )
+
+    return True
+
+
+def reset_deposito():
+    st.session_state.deposito = {"items": {}}
+    aggiorna_file_github(
+        DEPOSITO_FILE,
+        st.session_state.deposito,
+        "Reset deposito"
+    )
+    return True
