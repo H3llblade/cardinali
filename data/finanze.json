@@ -1,7 +1,7 @@
 {
     "cassa": 0,
     "fondo_cassa": 0,
-    "soldi_sporchi": 1553917.0,
+    "soldi_sporchi": 553917.0,
     "movimenti": [
         {
             "data": "19/03/2026 03:54:26",
@@ -14,6 +14,12 @@
             "tipo": "soldi_sporchi",
             "causale": "vendita armi",
             "valore": 1000000.0
+        },
+        {
+            "data": "19/03/2026 15:52:32",
+            "tipo": "soldi_sporchi",
+            "causale": "prelievo per cartello",
+            "valore": -1000000.0
         }
     ]
 }
