@@ -1,5 +1,5 @@
 {
-    "cassa": 3.0,
+    "cassa": 0,
     "fondo_cassa": 0,
     "soldi_sporchi": 553917.0,
     "movimenti": [
@@ -8,12 +8,6 @@
             "tipo": "soldi_sporchi",
             "causale": "start 19/03/26  h  05.00",
             "valore": 553917.0
-        },
-        {
-            "data": "19/03/2026 04:12:13",
-            "tipo": "cassa",
-            "causale": "Beretta  al 19/03/26",
-            "valore": 3.0
         }
     ]
 }
