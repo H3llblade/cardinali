@@ -1,20 +1,123 @@
-import sys
+import streamlit as st
+from datetime import datetime
+import requests
+import json
+import base64
 import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-import streamlit as st
-from gestionale import registra_movimento, registra_deposito
+st.set_page_config(layout="wide", page_title="Inserimento Finanze", page_icon="📝")
 
-st.set_page_config(layout="wide")
+# -------------------------------
+# CONFIG GITHUB
+# -------------------------------
+GITHUB_REPO_OWNER = st.secrets.get("GITHUB_OWNER", "")
+GITHUB_REPO_NAME = st.secrets.get("GITHUB_REPO", "")
+GITHUB_TOKEN = st.secrets.get("GITHUB_PAT", "")
+GITHUB_FILE_PATH = "data/finanze.json"
 
-st.title("📝 Inserimento")
-st.divider()
+GITHUB_API_URL = ""
+if GITHUB_REPO_OWNER and GITHUB_REPO_NAME:
+    GITHUB_API_URL = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/{GITHUB_FILE_PATH}"
+
+HEADERS = {
+    "Authorization": f"token {GITHUB_TOKEN}",
+    "Accept": "application/vnd.github+json"
+}
+
+# -------------------------------
+# DEFAULT DATI
+# -------------------------------
+DEFAULT_DATI = {
+    "cassa": 0,
+    "fondo_cassa": 0,
+    "soldi_sporchi": 0,
+    "movimenti": []
+}
+
+# -------------------------------
+# FUNZIONI GITHUB
+# -------------------------------
+def github_ok():
+    return all([GITHUB_REPO_OWNER, GITHUB_REPO_NAME, GITHUB_TOKEN, GITHUB_API_URL])
 
 
-# =========================
+def leggi_file_github():
+    if not github_ok():
+        return DEFAULT_DATI.copy()
+
+    try:
+        r = requests.get(GITHUB_API_URL, headers=HEADERS, timeout=15)
+        if r.status_code == 200:
+            content = r.json().get("content", "")
+            decoded = base64.b64decode(content).decode("utf-8")
+            dati = json.loads(decoded)
+
+            if not isinstance(dati, dict):
+                return DEFAULT_DATI.copy()
+
+            if "cassa" not in dati:
+                dati["cassa"] = 0
+            if "fondo_cassa" not in dati:
+                dati["fondo_cassa"] = 0
+            if "soldi_sporchi" not in dati:
+                dati["soldi_sporchi"] = 0
+            if "movimenti" not in dati or not isinstance(dati["movimenti"], list):
+                dati["movimenti"] = []
+
+            return dati
+
+        return DEFAULT_DATI.copy()
+
+    except Exception:
+        return DEFAULT_DATI.copy()
+
+
+def aggiorna_file_github(dati):
+    if not github_ok():
+        st.error("Configurazione GitHub mancante nelle secrets.")
+        return False
+
+    try:
+        r = requests.get(GITHUB_API_URL, headers=HEADERS, timeout=15)
+        sha = r.json().get("sha") if r.status_code == 200 else None
+
+        json_str = json.dumps(dati, indent=4, ensure_ascii=False)
+        json_base64 = base64.b64encode(json_str.encode("utf-8")).decode("utf-8")
+
+        payload = {
+            "message": "Aggiornamento finanze",
+            "content": json_base64
+        }
+
+        if sha:
+            payload["sha"] = sha
+
+        put_r = requests.put(GITHUB_API_URL, headers=HEADERS, json=payload, timeout=15)
+
+        if put_r.status_code in [200, 201]:
+            return True
+
+        st.error(f"Errore aggiornamento GitHub: {put_r.text}")
+        return False
+
+    except Exception as e:
+        st.error(f"Errore salvataggio GitHub: {e}")
+        return False
+
+
+# -------------------------------
+# STATO
+# -------------------------------
+if "dati_finanze" not in st.session_state:
+    st.session_state.dati_finanze = leggi_file_github()
+
+
+# -------------------------------
 # RESET CAMPI
-# =========================
+# -------------------------------
 def reset_finanze():
     st.session_state.cassa_causale = ""
     st.session_state.cassa_valore = 0.0
@@ -24,23 +127,6 @@ def reset_finanze():
     st.session_state.fc_valore = 0.0
 
 
-def reset_magazzino():
-    st.session_state.item1_nome = ""
-    st.session_state.item1_causale = ""
-    st.session_state.item1_valore = 0.0
-
-    st.session_state.item2_nome = ""
-    st.session_state.item2_causale = ""
-    st.session_state.item2_valore = 0.0
-
-    st.session_state.item3_nome = ""
-    st.session_state.item3_causale = ""
-    st.session_state.item3_valore = 0.0
-
-
-# =========================
-# DEFAULT SESSION STATE
-# =========================
 defaults = {
     "cassa_causale": "",
     "cassa_valore": 0.0,
@@ -48,18 +134,6 @@ defaults = {
     "ss_valore": 0.0,
     "fc_causale": "",
     "fc_valore": 0.0,
-
-    "item1_nome": "",
-    "item1_causale": "",
-    "item1_valore": 0.0,
-
-    "item2_nome": "",
-    "item2_causale": "",
-    "item2_valore": 0.0,
-
-    "item3_nome": "",
-    "item3_causale": "",
-    "item3_valore": 0.0,
 }
 
 for k, v in defaults.items():
@@ -67,151 +141,93 @@ for k, v in defaults.items():
         st.session_state[k] = v
 
 
-# =========================
-# LAYOUT UNICO IN 3 COLONNE
-# =========================
+# -------------------------------
+# FUNZIONE REGISTRA MOVIMENTO
+# -------------------------------
+def registra_movimento(tipo, causale, valore):
+    causale = str(causale).strip()
+
+    if not causale:
+        st.warning("Inserisci una causale valida.")
+        return False
+
+    try:
+        valore = float(valore)
+    except Exception:
+        st.warning("Inserisci un valore valido.")
+        return False
+
+    if tipo not in ["cassa", "soldi_sporchi", "fondo_cassa"]:
+        st.error("Tipo movimento non valido.")
+        return False
+
+    dati = leggi_file_github()
+
+    dati["movimenti"].append({
+        "data": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+        "tipo": tipo,
+        "causale": causale,
+        "valore": valore
+    })
+
+    dati[tipo] += valore
+
+    if aggiorna_file_github(dati):
+        st.session_state.dati_finanze = dati
+        return True
+
+    return False
+
+
+# -------------------------------
+# HEADER
+# -------------------------------
+st.title("📝 Inserimento Finanze")
+st.divider()
+
 col1, col2, col3 = st.columns(3, gap="large")
 
-
-# =========================
-# COLONNA 1
-# =========================
 with col1:
     st.markdown("## 💰 Cassa")
     cassa_causale = st.text_input("Causale Cassa", key="cassa_causale")
     cassa_valore = st.number_input(
-        "Valore Cassa",
-        min_value=0.0,
+        "Importo Cassa (+ / -)",
         step=1.0,
         key="cassa_valore"
     )
 
     if st.button("✅ Registra Cassa", key="btn_cassa", use_container_width=True):
-        if not cassa_causale.strip():
-            st.warning("Inserisci una causale per la cassa.")
-        else:
-            ok = registra_movimento("cassa", cassa_causale, cassa_valore)
-            if ok:
-                reset_finanze()
-                st.success(f"Cassa aggiornata di {cassa_valore}")
-                st.rerun()
+        if registra_movimento("cassa", cassa_causale, cassa_valore):
+            reset_finanze()
+            st.success("Movimento Cassa registrato")
+            st.rerun()
 
-    st.divider()
-
-    st.markdown("## 📦 Item 1")
-    item1_nome = st.text_input("Nome Item 1", key="item1_nome")
-    item1_causale = st.text_input("Causale Item 1", key="item1_causale")
-    item1_valore = st.number_input(
-        "Quantità Item 1",
-        min_value=0.0,
-        step=1.0,
-        key="item1_valore"
-    )
-
-    if st.button("✅ Registra Item 1", key="btn_item1", use_container_width=True):
-        if not item1_nome.strip():
-            st.warning("Inserisci il nome del primo item.")
-        elif not item1_causale.strip():
-            st.warning("Inserisci una causale per il primo item.")
-        else:
-            ok = registra_deposito(item1_nome, item1_valore)
-            if ok:
-                reset_magazzino()
-                st.success(f"{item1_nome} aggiornato di {item1_valore}")
-                st.rerun()
-
-
-# =========================
-# COLONNA 2
-# =========================
 with col2:
     st.markdown("## 💸 Soldi Sporchi")
     ss_causale = st.text_input("Causale Soldi Sporchi", key="ss_causale")
     ss_valore = st.number_input(
-        "Valore Soldi Sporchi",
-        min_value=0.0,
+        "Importo Soldi Sporchi (+ / -)",
         step=1.0,
         key="ss_valore"
     )
 
     if st.button("✅ Registra Soldi Sporchi", key="btn_ss", use_container_width=True):
-        if not ss_causale.strip():
-            st.warning("Inserisci una causale per i soldi sporchi.")
-        else:
-            ok = registra_movimento("soldi_sporchi", ss_causale, ss_valore)
-            if ok:
-                reset_finanze()
-                st.success(f"Soldi Sporchi aggiornati di {ss_valore}")
-                st.rerun()
+        if registra_movimento("soldi_sporchi", ss_causale, ss_valore):
+            reset_finanze()
+            st.success("Movimento Soldi Sporchi registrato")
+            st.rerun()
 
-    st.divider()
-
-    st.markdown("## 📦 Item 2")
-    item2_nome = st.text_input("Nome Item 2", key="item2_nome")
-    item2_causale = st.text_input("Causale Item 2", key="item2_causale")
-    item2_valore = st.number_input(
-        "Quantità Item 2",
-        min_value=0.0,
-        step=1.0,
-        key="item2_valore"
-    )
-
-    if st.button("✅ Registra Item 2", key="btn_item2", use_container_width=True):
-        if not item2_nome.strip():
-            st.warning("Inserisci il nome del secondo item.")
-        elif not item2_causale.strip():
-            st.warning("Inserisci una causale per il secondo item.")
-        else:
-            ok = registra_deposito(item2_nome, item2_valore)
-            if ok:
-                reset_magazzino()
-                st.success(f"{item2_nome} aggiornato di {item2_valore}")
-                st.rerun()
-
-
-# =========================
-# COLONNA 3
-# =========================
 with col3:
     st.markdown("## 💼 Fondo Cassa")
     fc_causale = st.text_input("Causale Fondo Cassa", key="fc_causale")
     fc_valore = st.number_input(
-        "Valore Fondo Cassa",
-        min_value=0.0,
+        "Importo Fondo Cassa (+ / -)",
         step=1.0,
         key="fc_valore"
     )
 
     if st.button("✅ Registra Fondo Cassa", key="btn_fc", use_container_width=True):
-        if not fc_causale.strip():
-            st.warning("Inserisci una causale per il fondo cassa.")
-        else:
-            ok = registra_movimento("fondo_cassa", fc_causale, fc_valore)
-            if ok:
-                reset_finanze()
-                st.success(f"Fondo Cassa aggiornato di {fc_valore}")
-                st.rerun()
-
-    st.divider()
-
-    st.markdown("## 📦 Item 3")
-    item3_nome = st.text_input("Nome Item 3", key="item3_nome")
-    item3_causale = st.text_input("Causale Item 3", key="item3_causale")
-    item3_valore = st.number_input(
-        "Quantità Item 3",
-        min_value=0.0,
-        step=1.0,
-        key="item3_valore"
-    )
-
-    if st.button("✅ Registra Item 3", key="btn_item3", use_container_width=True):
-        if not item3_nome.strip():
-            st.warning("Inserisci il nome del terzo item.")
-        elif not item3_causale.strip():
-            st.warning("Inserisci una causale per il terzo item.")
-        else:
-            ok = registra_deposito(item3_nome, item3_valore)
-            if ok:
-                reset_magazzino()
-                st.success(f"{item3_nome} aggiornato di {item3_valore}")
-                st.rerun()
+        if registra_movimento("fondo_cassa", fc_causale, fc_valore):
+            reset_finanze()
+            st.success("Movimento Fondo Cassa registrato")
+            st.rerun()
