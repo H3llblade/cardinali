@@ -1,6 +1,14 @@
 {
-    "pistola": 0,
+    "pistola": 10.0,
     "silenziatore": 0,
     "caricatore": 0,
-    "movimenti": []
+    "movimenti": [
+        {
+            "data": "19/03/2026 03:00:30",
+            "tipo": "armeria",
+            "item": "pistola",
+            "causale": "test",
+            "valore": 10.0
+        }
+    ]
 }
