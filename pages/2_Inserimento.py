@@ -34,7 +34,8 @@ DEFAULT_FINANZE = {
 DEFAULT_ARMERIA = {
     "item1": 0,
     "item2": 0,
-    "item3": 0
+    "item3": 0,
+    "movimenti": []
 }
 
 # -------------------------------
@@ -43,8 +44,10 @@ DEFAULT_ARMERIA = {
 def github_ok():
     return all([GITHUB_REPO_OWNER, GITHUB_REPO_NAME, GITHUB_TOKEN])
 
+
 def get_github_api_url(file_path):
     return f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/{file_path}"
+
 
 def leggi_file_github(file_path, default_data):
     if not github_ok():
@@ -66,6 +69,7 @@ def leggi_file_github(file_path, default_data):
 
     except Exception:
         return default_data.copy()
+
 
 def aggiorna_file_github(file_path, dati, messaggio):
     if not github_ok():
@@ -100,8 +104,9 @@ def aggiorna_file_github(file_path, dati, messaggio):
         st.error(f"Errore salvataggio GitHub: {e}")
         return False
 
+
 # -------------------------------
-# STATO
+# SESSION STATE
 # -------------------------------
 if "reset_finanze_flag" not in st.session_state:
     st.session_state.reset_finanze_flag = False
@@ -119,9 +124,11 @@ defaults = {
     "ss_valore": 0.0,
     "fc_causale": "",
     "fc_valore": 0.0,
-
+    "arm_item1_causale": "",
     "arm_item1_valore": 0.0,
+    "arm_item2_causale": "",
     "arm_item2_valore": 0.0,
+    "arm_item3_causale": "",
     "arm_item3_valore": 0.0,
 }
 
@@ -129,7 +136,7 @@ for k, v in defaults.items():
     if k not in st.session_state:
         st.session_state[k] = v
 
-# reset sicuro prima dei widget
+# reset sicuro PRIMA dei widget
 if st.session_state.reset_finanze_flag:
     st.session_state.cassa_causale = ""
     st.session_state.cassa_valore = 0.0
@@ -140,10 +147,14 @@ if st.session_state.reset_finanze_flag:
     st.session_state.reset_finanze_flag = False
 
 if st.session_state.reset_armeria_flag:
+    st.session_state.arm_item1_causale = ""
     st.session_state.arm_item1_valore = 0.0
+    st.session_state.arm_item2_causale = ""
     st.session_state.arm_item2_valore = 0.0
+    st.session_state.arm_item3_causale = ""
     st.session_state.arm_item3_valore = 0.0
     st.session_state.reset_armeria_flag = False
+
 
 # -------------------------------
 # FUNZIONI FINANZE
@@ -167,12 +178,12 @@ def registra_movimento(tipo, causale, valore):
 
     dati = leggi_file_github(FINANZE_FILE_PATH, DEFAULT_FINANZE)
 
-    if "movimenti" not in dati or not isinstance(dati["movimenti"], list):
-        dati["movimenti"] = []
-
     dati.setdefault("cassa", 0)
     dati.setdefault("soldi_sporchi", 0)
     dati.setdefault("fondo_cassa", 0)
+
+    if "movimenti" not in dati or not isinstance(dati["movimenti"], list):
+        dati["movimenti"] = []
 
     dati["movimenti"].append({
         "data": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
@@ -185,10 +196,17 @@ def registra_movimento(tipo, causale, valore):
 
     return aggiorna_file_github(FINANZE_FILE_PATH, dati, f"Aggiornamento finanze: {tipo}")
 
+
 # -------------------------------
 # FUNZIONI ARMERIA
 # -------------------------------
-def registra_armeria(item_key, valore):
+def registra_armeria(item_key, causale, valore):
+    causale = str(causale).strip()
+
+    if not causale:
+        st.warning("Inserisci una causale valida.")
+        return False
+
     try:
         valore = float(valore)
     except Exception:
@@ -205,9 +223,21 @@ def registra_armeria(item_key, valore):
     dati.setdefault("item2", 0)
     dati.setdefault("item3", 0)
 
+    if "movimenti" not in dati or not isinstance(dati["movimenti"], list):
+        dati["movimenti"] = []
+
     dati[item_key] += valore
 
+    dati["movimenti"].append({
+        "data": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+        "tipo": "armeria",
+        "item": item_key,
+        "causale": causale,
+        "valore": valore
+    })
+
     return aggiorna_file_github(ARMERIA_FILE_PATH, dati, f"Aggiornamento armeria: {item_key}")
+
 
 # -------------------------------
 # HEADER
@@ -270,30 +300,33 @@ col4, col5, col6 = st.columns(3, gap="large")
 
 with col4:
     st.markdown("## 🔫 Item 1")
+    arm_item1_causale = st.text_input("Causale Item 1", key="arm_item1_causale")
     arm_item1_valore = st.number_input("Quantità Item 1 (+ / -)", step=1.0, key="arm_item1_valore")
 
     if st.button("✅ Registra Item 1", key="btn_item1", use_container_width=True):
-        if registra_armeria("item1", arm_item1_valore):
+        if registra_armeria("item1", arm_item1_causale, arm_item1_valore):
             st.session_state.messaggio_ok = "Item 1 aggiornato"
             st.session_state.reset_armeria_flag = True
             st.rerun()
 
 with col5:
     st.markdown("## 🧰 Item 2")
+    arm_item2_causale = st.text_input("Causale Item 2", key="arm_item2_causale")
     arm_item2_valore = st.number_input("Quantità Item 2 (+ / -)", step=1.0, key="arm_item2_valore")
 
     if st.button("✅ Registra Item 2", key="btn_item2", use_container_width=True):
-        if registra_armeria("item2", arm_item2_valore):
+        if registra_armeria("item2", arm_item2_causale, arm_item2_valore):
             st.session_state.messaggio_ok = "Item 2 aggiornato"
             st.session_state.reset_armeria_flag = True
             st.rerun()
 
 with col6:
     st.markdown("## 📦 Item 3")
+    arm_item3_causale = st.text_input("Causale Item 3", key="arm_item3_causale")
     arm_item3_valore = st.number_input("Quantità Item 3 (+ / -)", step=1.0, key="arm_item3_valore")
 
     if st.button("✅ Registra Item 3", key="btn_item3", use_container_width=True):
-        if registra_armeria("item3", arm_item3_valore):
+        if registra_armeria("item3", arm_item3_causale, arm_item3_valore):
             st.session_state.messaggio_ok = "Item 3 aggiornato"
             st.session_state.reset_armeria_flag = True
             st.rerun()
