@@ -1,17 +1,6 @@
 {
     "pistola": 0,
     "silenziatore": 0,
-    "caricatori": 0,
-    "movimenti": [
-        {
-            "data": "19/03/2026 02:49:47",
-            "tipo": "armeria",
-            "item": "item1",
-            "causale": "test",
-            "valore": 10.0
-        }
-    ],
-    "item1": 10.0,
-    "item2": 0,
-    "item3": 0
+    "caricatore": 0,
+    "movimenti": []
 }
