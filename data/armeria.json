@@ -1,5 +1,5 @@
 {
-    "pistola": 2.0,
+    "pistola": 3.0,
     "silenziatore": 0,
     "caricatore": 6.0,
     "movimenti": [
@@ -16,6 +16,13 @@
             "item": "caricatore",
             "causale": "+ Caricatori estesi",
             "valore": 6.0
+        },
+        {
+            "data": "19/03/2026 04:14:44",
+            "tipo": "armeria",
+            "item": "pistola",
+            "causale": "Pistola Sns",
+            "valore": 1.0
         }
     ]
 }
