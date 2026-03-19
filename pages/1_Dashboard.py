@@ -96,6 +96,24 @@ def estrai_items_deposito(deposito):
 
     return items_puliti
 
+    def estrai_items_droghe(droghe):
+    if not isinstance(droghe, dict):
+        return {}
+
+    sorgente = droghe.get("items", droghe)
+
+    if not isinstance(sorgente, dict):
+        return {}
+
+    items_puliti = {}
+    for k, v in sorgente.items():
+        if k == "movimenti":
+            continue
+        valore = converti_valore(v)
+        if valore is not None:
+            items_puliti[str(k).strip().lower()] = valore
+
+    return items_puliti
 
 # =========================
 # CARICAMENTO DATI
