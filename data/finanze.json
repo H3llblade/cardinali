@@ -1,13 +1,19 @@
 {
     "cassa": 500000.0,
     "fondo_cassa": 0,
-    "soldi_sporchi": 0,
+    "soldi_sporchi": 250000.0,
     "movimenti": [
         {
             "data": "19/03/2026 02:07:24",
             "tipo": "cassa",
             "causale": "vendita 10 sns",
             "valore": 500000.0
+        },
+        {
+            "data": "19/03/2026 02:08:14",
+            "tipo": "soldi_sporchi",
+            "causale": "vendita 100 meth ",
+            "valore": 250000.0
         }
     ]
 }
