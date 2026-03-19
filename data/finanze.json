@@ -1,7 +1,7 @@
 {
     "cassa": 500000.0,
     "fondo_cassa": 0,
-    "soldi_sporchi": 750000.0,
+    "soldi_sporchi": 1000000.0,
     "movimenti": [
         {
             "data": "19/03/2026 02:07:24",
@@ -23,6 +23,12 @@
         },
         {
             "data": "19/03/2026 02:08:40",
+            "tipo": "soldi_sporchi",
+            "causale": "vednita 100 meth",
+            "valore": 250000.0
+        },
+        {
+            "data": "19/03/2026 02:08:43",
             "tipo": "soldi_sporchi",
             "causale": "vednita 100 meth",
             "valore": 250000.0
