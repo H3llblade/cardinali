@@ -32,9 +32,9 @@ DEFAULT_FINANZE = {
 }
 
 DEFAULT_ARMERIA = {
-    "item1": 0,
-    "item2": 0,
-    "item3": 0,
+    "pistola": 0,
+    "silenziatore": 0,
+    "caricatore": 0,
     "movimenti": []
 }
 
@@ -213,15 +213,15 @@ def registra_armeria(item_key, causale, valore):
         st.warning("Inserisci un valore valido.")
         return False
 
-    if item_key not in ["item1", "item2", "item3"]:
+    if item_key not in ["pistola", "silenziatore", "caricatore"]:
         st.error("Item armeria non valido.")
         return False
 
     dati = leggi_file_github(ARMERIA_FILE_PATH, DEFAULT_ARMERIA)
 
-    dati.setdefault("item1", 0)
-    dati.setdefault("item2", 0)
-    dati.setdefault("item3", 0)
+    dati.setdefault("pistola", 0)
+    dati.setdefault("silenziatore", 0)
+    dati.setdefault("caricatore", 0)
 
     if "movimenti" not in dati or not isinstance(dati["movimenti"], list):
         dati["movimenti"] = []
@@ -300,30 +300,30 @@ col4, col5, col6 = st.columns(3, gap="large")
 
 with col4:
     st.markdown("## 🔫 Pistola")
-    arm_item1_causale = st.text_input("Causale Pistola", key="arm_pistola_causale")
-    arm_item1_valore = st.number_input("Quantità Pistola (+ / -)", step=1.0, key="arm_pistola_valore")
+    arm_pistola_causale = st.text_input("Causale Pistola", key="arm_pistola_causale")
+    arm_pistola_valore = st.number_input("Quantità Pistola (+ / -)", step=1.0, key="arm_pistola_valore")
 
     if st.button("✅ Registra Pistola", key="btn_pistola", use_container_width=True):
         if registra_armeria("pistola", arm_pistola_causale, arm_pistola_valore):
-            st.session_state.messaggio_ok = "Pistola aggiornato"
+            st.session_state.messaggio_ok = "Pistola aggiornata"
             st.session_state.reset_armeria_flag = True
             st.rerun()
 
 with col5:
-    st.markdown("## 🧰 Silenziatore")
-    arm_item2_causale = st.text_input("Causale Silenziatore", key="arm_silenziatore_causale")
-    arm_item2_valore = st.number_input("Quantità Silenziatore (+ / -)", step=1.0, key="arm_silenziatore_valore")
+    st.markdown("## 🔇 Silenziatore")
+    arm_silenziatore_causale = st.text_input("Causale Silenziatore", key="arm_silenziatore_causale")
+    arm_silenziatore_valore = st.number_input("Quantità Silenziatore (+ / -)", step=1.0, key="arm_silenziatore_valore")
 
-    if st.button("✅ Registra Silenziatore", key="btn_item2", use_container_width=True):
+    if st.button("✅ Registra Silenziatore", key="btn_silenziatore", use_container_width=True):
         if registra_armeria("silenziatore", arm_silenziatore_causale, arm_silenziatore_valore):
             st.session_state.messaggio_ok = "Silenziatore aggiornato"
             st.session_state.reset_armeria_flag = True
             st.rerun()
 
 with col6:
-    st.markdown("## 📦 Caricatore")
-    arm_item3_causale = st.text_input("Causale Caricatore", key="arm_caricatore_causale")
-    arm_item3_valore = st.number_input("Quantità Caricatore (+ / -)", step=1.0, key="arm_caricatore_valore")
+    st.markdown("## 🧱 Caricatore")
+    arm_caricatore_causale = st.text_input("Causale Caricatore", key="arm_caricatore_causale")
+    arm_caricatore_valore = st.number_input("Quantità Caricatore (+ / -)", step=1.0, key="arm_caricatore_valore")
 
     if st.button("✅ Registra Caricatore", key="btn_caricatore", use_container_width=True):
         if registra_armeria("caricatore", arm_caricatore_causale, arm_caricatore_valore):
