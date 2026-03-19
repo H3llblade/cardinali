@@ -9,6 +9,10 @@ try:
 except Exception:
     pass
 
+
+# =========================
+# CONFIG
+# =========================
 GITHUB_REPO_OWNER = st.secrets.get("GITHUB_OWNER", "")
 GITHUB_REPO_NAME = st.secrets.get("GITHUB_REPO", "")
 GITHUB_TOKEN = st.secrets.get("GITHUB_PAT", "")
@@ -21,7 +25,6 @@ HEADERS = {
 
 FINANZE_FILE = "data/finanze.json"
 DEPOSITO_FILE = "data/deposito.json"
-WEBHOOK_URL = st.secrets.get("DISCORD_WEBHOOK_URL", "")
 
 DEFAULT_FINANZE = {
     "cassa": 0,
@@ -35,8 +38,14 @@ DEFAULT_DEPOSITO = {
 }
 
 
+# =========================
+# UTILS
+# =========================
+def github_config_ok():
+    return all([GITHUB_REPO_OWNER, GITHUB_REPO_NAME, GITHUB_TOKEN])
+
+
 def parse_json_safely(value):
-    """Converte stringhe JSON annidate in oggetti Python."""
     current = value
 
     for _ in range(3):
@@ -51,30 +60,61 @@ def parse_json_safely(value):
     return current
 
 
+def converti_valore(v):
+    if isinstance(v, (int, float)):
+        return float(v)
+
+    if isinstance(v, str):
+        try:
+            return float(v.strip().replace(",", "."))
+        except Exception:
+            return None
+
+    return None
+
+
+def formatta(num):
+    try:
+        n = float(num)
+        if n.is_integer():
+            return f"{int(n):,}".replace(",", ".")
+        return f"{n:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    except Exception:
+        return "0"
+
+
+# =========================
+# GITHUB
+# =========================
 def leggi_file_github(file_path, default_data):
+    if not github_config_ok():
+        return default_data.copy() if isinstance(default_data, dict) else default_data
+
     url = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/{file_path}"
 
     try:
         r = requests.get(url, headers=HEADERS, timeout=15)
 
         if r.status_code == 200:
-            content = r.json()["content"]
+            content = r.json().get("content", "")
             decoded = base64.b64decode(content).decode("utf-8")
             dati = parse_json_safely(decoded)
 
-            if not isinstance(dati, dict):
-                return default_data.copy()
+            if isinstance(dati, dict):
+                return dati
 
-            return dati
-
-        return default_data.copy()
+        return default_data.copy() if isinstance(default_data, dict) else default_data
 
     except Exception as e:
         print(f"Errore lettura GitHub ({file_path}): {e}")
-        return default_data.copy()
+        return default_data.copy() if isinstance(default_data, dict) else default_data
 
 
 def aggiorna_file_github(file_path, dati, messaggio_commit):
+    if not github_config_ok():
+        st.warning("Secrets GitHub mancanti: salvataggio remoto non disponibile.")
+        return False
+
     url = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/{file_path}"
 
     try:
@@ -97,17 +137,16 @@ def aggiorna_file_github(file_path, dati, messaggio_commit):
         if put_r.status_code not in [200, 201]:
             raise Exception(f"GitHub API error: {put_r.status_code} - {put_r.text}")
 
+        return True
+
     except Exception as e:
         st.error(f"Errore aggiornamento GitHub su {file_path}: {e}")
+        return False
 
 
-def formatta(num):
-    try:
-        return f"{round(float(num)):,}".replace(",", ".")
-    except Exception:
-        return "0"
-
-
+# =========================
+# DISCORD
+# =========================
 def invia_discord(tipo, causale, valore, totale):
     if not WEBHOOK_URL:
         return
@@ -126,23 +165,15 @@ def invia_discord(tipo, causale, valore, totale):
         pass
 
 
+# =========================
+# DEPOSITO
+# =========================
 def normalizza_deposito(deposito):
     deposito = parse_json_safely(deposito)
 
     if not isinstance(deposito, dict):
         return {"items": {}}
 
-    def converti_valore(v):
-        if isinstance(v, (int, float)):
-            return float(v)
-        if isinstance(v, str):
-            try:
-                return float(v.strip().replace(",", "."))
-            except Exception:
-                return None
-        return None
-
-    # Caso 1: formato {"items": {...}}
     if "items" in deposito:
         items = parse_json_safely(deposito["items"])
 
@@ -155,7 +186,6 @@ def normalizza_deposito(deposito):
 
             return {"items": items_puliti}
 
-    # Caso 2: formato vecchio {"foglie":100} oppure {"foglie":"100"}
     items_puliti = {}
     for k, v in deposito.items():
         valore = converti_valore(v)
@@ -165,12 +195,27 @@ def normalizza_deposito(deposito):
     return {"items": items_puliti}
 
 
+# =========================
+# CARICAMENTO DATI
+# =========================
 def carica_dati():
     finanze = leggi_file_github(FINANZE_FILE, DEFAULT_FINANZE)
     deposito = leggi_file_github(DEPOSITO_FILE, DEFAULT_DEPOSITO)
 
     if not isinstance(finanze, dict):
         finanze = DEFAULT_FINANZE.copy()
+
+    if "movimenti" not in finanze or not isinstance(finanze["movimenti"], list):
+        finanze["movimenti"] = []
+
+    if "cassa" not in finanze:
+        finanze["cassa"] = 0
+
+    if "fondo_cassa" not in finanze:
+        finanze["fondo_cassa"] = 0
+
+    if "soldi_sporchi" not in finanze:
+        finanze["soldi_sporchi"] = 0
 
     deposito = normalizza_deposito(deposito)
 
@@ -182,16 +227,29 @@ def aggiorna_dati_da_github():
     carica_dati()
 
 
+# inizializzazione sicura
 if "finanze" not in st.session_state:
     st.session_state.finanze = DEFAULT_FINANZE.copy()
 
 if "deposito" not in st.session_state:
     st.session_state.deposito = DEFAULT_DEPOSITO.copy()
 
+# carica solo se GitHub è configurato, altrimenti resta sui default
+if github_config_ok():
+    carica_dati()
 
+
+# =========================
+# REGISTRAZIONI
+# =========================
 def registra_movimento(tipo, causale, valore):
     if tipo not in ["cassa", "soldi_sporchi", "fondo_cassa"]:
         st.error(f"Tipo non valido: {tipo}")
+        return False
+
+    causale = str(causale).strip()
+    if not causale:
+        st.error("Inserisci una causale valida.")
         return False
 
     try:
@@ -206,7 +264,7 @@ def registra_movimento(tipo, causale, valore):
         finanze["movimenti"] = []
 
     if tipo not in finanze:
-        finanze[tipo] = 0
+        finanze[tipo] = 0.0
 
     finanze["movimenti"].append({
         "data": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
@@ -229,15 +287,16 @@ def registra_movimento(tipo, causale, valore):
 
 
 def registra_deposito(nome_articolo, quantita):
-    try:
-        nome_articolo = str(nome_articolo).strip().lower()
-        quantita = float(quantita)
-    except Exception:
-        st.error("Nome articolo o quantità non validi.")
-        return False
+    nome_articolo = str(nome_articolo).strip().lower()
 
     if not nome_articolo:
         st.error("Inserisci un nome articolo valido.")
+        return False
+
+    try:
+        quantita = float(quantita)
+    except Exception:
+        st.error("Quantità non valida.")
         return False
 
     deposito = st.session_state.get("deposito", {"items": {}})
@@ -249,25 +308,15 @@ def registra_deposito(nome_articolo, quantita):
         deposito["items"] = {}
 
     if nome_articolo not in deposito["items"]:
-        deposito["items"][nome_articolo] = 0
+        deposito["items"][nome_articolo] = 0.0
 
     deposito["items"][nome_articolo] += quantita
     st.session_state.deposito = deposito
 
     aggiorna_file_github(
-        "data/deposito.json",
+        DEPOSITO_FILE,
         deposito,
         f"Aggiornamento deposito: {nome_articolo}"
     )
 
-    return True
-
-
-def reset_deposito():
-    st.session_state.deposito = {"items": {}}
-    aggiorna_file_github(
-        DEPOSITO_FILE,
-        st.session_state.deposito,
-        "Reset deposito"
-    )
     return True
