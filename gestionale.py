@@ -241,7 +241,13 @@ def registra_deposito(nome_articolo, quantita):
         st.error("Inserisci un nome articolo valido.")
         return False
 
-    deposito = normalizza_deposito(st.session_state.get("deposito", DEFAULT_DEPOSITO.copy()))
+    deposito = st.session_state.get("deposito", {"items": {}})
+
+    if not isinstance(deposito, dict):
+        deposito = {"items": {}}
+
+    if "items" not in deposito or not isinstance(deposito["items"], dict):
+        deposito["items"] = {}
 
     if nome_articolo not in deposito["items"]:
         deposito["items"][nome_articolo] = 0
@@ -250,7 +256,7 @@ def registra_deposito(nome_articolo, quantita):
     st.session_state.deposito = deposito
 
     aggiorna_file_github(
-        DEPOSITO_FILE,
+        "data/deposito.json",
         deposito,
         f"Aggiornamento deposito: {nome_articolo}"
     )
