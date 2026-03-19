@@ -4,7 +4,7 @@ import requests
 import json
 import base64
 
-st.set_page_config(layout="wide", page_title="Inserimento Finanze", page_icon="📝")
+st.set_page_config(layout="wide", page_title="Inserimento", page_icon="📝")
 
 # -------------------------------
 # CONFIG GITHUB
@@ -12,79 +12,83 @@ st.set_page_config(layout="wide", page_title="Inserimento Finanze", page_icon="�
 GITHUB_REPO_OWNER = st.secrets.get("GITHUB_OWNER", "")
 GITHUB_REPO_NAME = st.secrets.get("GITHUB_REPO", "")
 GITHUB_TOKEN = st.secrets.get("GITHUB_PAT", "")
-GITHUB_FILE_PATH = "data/finanze.json"
 
-GITHUB_API_URL = ""
-if GITHUB_REPO_OWNER and GITHUB_REPO_NAME:
-    GITHUB_API_URL = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/{GITHUB_FILE_PATH}"
+FINANZE_FILE_PATH = "data/finanze.json"
+ARMERIA_FILE_PATH = "data/armeria.json"
 
 HEADERS = {
     "Authorization": f"token {GITHUB_TOKEN}",
     "Accept": "application/vnd.github+json"
 }
 
-DEFAULT_DATI = {
+# -------------------------------
+# DEFAULT DATI
+# -------------------------------
+DEFAULT_FINANZE = {
     "cassa": 0,
     "fondo_cassa": 0,
     "soldi_sporchi": 0,
     "movimenti": []
 }
 
+DEFAULT_ARMERIA = {
+    "item1": 0,
+    "item2": 0,
+    "item3": 0
+}
+
 # -------------------------------
 # FUNZIONI GITHUB
 # -------------------------------
 def github_ok():
-    return all([GITHUB_REPO_OWNER, GITHUB_REPO_NAME, GITHUB_TOKEN, GITHUB_API_URL])
+    return all([GITHUB_REPO_OWNER, GITHUB_REPO_NAME, GITHUB_TOKEN])
 
+def get_github_api_url(file_path):
+    return f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/{file_path}"
 
-def leggi_file_github():
+def leggi_file_github(file_path, default_data):
     if not github_ok():
-        return DEFAULT_DATI.copy()
+        return default_data.copy()
 
     try:
-        r = requests.get(GITHUB_API_URL, headers=HEADERS, timeout=15)
+        url = get_github_api_url(file_path)
+        r = requests.get(url, headers=HEADERS, timeout=15)
+
         if r.status_code == 200:
             content = r.json().get("content", "")
             decoded = base64.b64decode(content).decode("utf-8")
             dati = json.loads(decoded)
 
-            if not isinstance(dati, dict):
-                return DEFAULT_DATI.copy()
+            if isinstance(dati, dict):
+                return dati
 
-            dati.setdefault("cassa", 0)
-            dati.setdefault("fondo_cassa", 0)
-            dati.setdefault("soldi_sporchi", 0)
-            dati.setdefault("movimenti", [])
-
-            return dati
-
-        return DEFAULT_DATI.copy()
+        return default_data.copy()
 
     except Exception:
-        return DEFAULT_DATI.copy()
+        return default_data.copy()
 
-
-def aggiorna_file_github(dati):
+def aggiorna_file_github(file_path, dati, messaggio):
     if not github_ok():
         st.error("Configurazione GitHub mancante nelle secrets.")
         return False
 
     try:
-        r = requests.get(GITHUB_API_URL, headers=HEADERS, timeout=15)
+        url = get_github_api_url(file_path)
+        r = requests.get(url, headers=HEADERS, timeout=15)
         sha = r.json().get("sha") if r.status_code == 200 else None
 
         json_str = json.dumps(dati, indent=4, ensure_ascii=False)
         json_base64 = base64.b64encode(json_str.encode("utf-8")).decode("utf-8")
 
         payload = {
-            "message": "Aggiornamento finanze",
+            "message": messaggio,
             "content": json_base64
         }
 
         if sha:
             payload["sha"] = sha
 
-        put_r = requests.put(GITHUB_API_URL, headers=HEADERS, json=payload, timeout=15)
+        put_r = requests.put(url, headers=HEADERS, json=payload, timeout=15)
 
         if put_r.status_code in [200, 201]:
             return True
@@ -96,15 +100,17 @@ def aggiorna_file_github(dati):
         st.error(f"Errore salvataggio GitHub: {e}")
         return False
 
-
 # -------------------------------
 # STATO
 # -------------------------------
-if "dati_finanze" not in st.session_state:
-    st.session_state.dati_finanze = leggi_file_github()
-
 if "reset_finanze_flag" not in st.session_state:
     st.session_state.reset_finanze_flag = False
+
+if "reset_armeria_flag" not in st.session_state:
+    st.session_state.reset_armeria_flag = False
+
+if "messaggio_ok" not in st.session_state:
+    st.session_state.messaggio_ok = ""
 
 defaults = {
     "cassa_causale": "",
@@ -113,14 +119,17 @@ defaults = {
     "ss_valore": 0.0,
     "fc_causale": "",
     "fc_valore": 0.0,
-    "messaggio_ok": ""
+
+    "arm_item1_valore": 0.0,
+    "arm_item2_valore": 0.0,
+    "arm_item3_valore": 0.0,
 }
 
 for k, v in defaults.items():
     if k not in st.session_state:
         st.session_state[k] = v
 
-# reset sicuro PRIMA dei widget
+# reset sicuro prima dei widget
 if st.session_state.reset_finanze_flag:
     st.session_state.cassa_causale = ""
     st.session_state.cassa_valore = 0.0
@@ -130,9 +139,14 @@ if st.session_state.reset_finanze_flag:
     st.session_state.fc_valore = 0.0
     st.session_state.reset_finanze_flag = False
 
+if st.session_state.reset_armeria_flag:
+    st.session_state.arm_item1_valore = 0.0
+    st.session_state.arm_item2_valore = 0.0
+    st.session_state.arm_item3_valore = 0.0
+    st.session_state.reset_armeria_flag = False
 
 # -------------------------------
-# FUNZIONE REGISTRA MOVIMENTO
+# FUNZIONI FINANZE
 # -------------------------------
 def registra_movimento(tipo, causale, valore):
     causale = str(causale).strip()
@@ -151,7 +165,14 @@ def registra_movimento(tipo, causale, valore):
         st.error("Tipo movimento non valido.")
         return False
 
-    dati = leggi_file_github()
+    dati = leggi_file_github(FINANZE_FILE_PATH, DEFAULT_FINANZE)
+
+    if "movimenti" not in dati or not isinstance(dati["movimenti"], list):
+        dati["movimenti"] = []
+
+    dati.setdefault("cassa", 0)
+    dati.setdefault("soldi_sporchi", 0)
+    dati.setdefault("fondo_cassa", 0)
 
     dati["movimenti"].append({
         "data": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
@@ -162,22 +183,46 @@ def registra_movimento(tipo, causale, valore):
 
     dati[tipo] += valore
 
-    if aggiorna_file_github(dati):
-        st.session_state.dati_finanze = dati
-        return True
+    return aggiorna_file_github(FINANZE_FILE_PATH, dati, f"Aggiornamento finanze: {tipo}")
 
-    return False
+# -------------------------------
+# FUNZIONI ARMERIA
+# -------------------------------
+def registra_armeria(item_key, valore):
+    try:
+        valore = float(valore)
+    except Exception:
+        st.warning("Inserisci un valore valido.")
+        return False
 
+    if item_key not in ["item1", "item2", "item3"]:
+        st.error("Item armeria non valido.")
+        return False
+
+    dati = leggi_file_github(ARMERIA_FILE_PATH, DEFAULT_ARMERIA)
+
+    dati.setdefault("item1", 0)
+    dati.setdefault("item2", 0)
+    dati.setdefault("item3", 0)
+
+    dati[item_key] += valore
+
+    return aggiorna_file_github(ARMERIA_FILE_PATH, dati, f"Aggiornamento armeria: {item_key}")
 
 # -------------------------------
 # HEADER
 # -------------------------------
-st.title("📝 Inserimento Finanze")
+st.title("📝 Inserimento")
 st.divider()
 
 if st.session_state.messaggio_ok:
     st.success(st.session_state.messaggio_ok)
     st.session_state.messaggio_ok = ""
+
+# ===============================
+# SEZIONE FINANZE
+# ===============================
+st.subheader("💰 Gestione Finanze")
 
 col1, col2, col3 = st.columns(3, gap="large")
 
@@ -212,4 +257,43 @@ with col3:
         if registra_movimento("fondo_cassa", fc_causale, fc_valore):
             st.session_state.messaggio_ok = "Movimento Fondo Cassa registrato"
             st.session_state.reset_finanze_flag = True
+            st.rerun()
+
+st.divider()
+
+# ===============================
+# SEZIONE ARMERIA
+# ===============================
+st.subheader("🪖 Gestione Armeria")
+
+col4, col5, col6 = st.columns(3, gap="large")
+
+with col4:
+    st.markdown("## 🔫 Item 1")
+    arm_item1_valore = st.number_input("Quantità Item 1 (+ / -)", step=1.0, key="arm_item1_valore")
+
+    if st.button("✅ Registra Item 1", key="btn_item1", use_container_width=True):
+        if registra_armeria("item1", arm_item1_valore):
+            st.session_state.messaggio_ok = "Item 1 aggiornato"
+            st.session_state.reset_armeria_flag = True
+            st.rerun()
+
+with col5:
+    st.markdown("## 🧰 Item 2")
+    arm_item2_valore = st.number_input("Quantità Item 2 (+ / -)", step=1.0, key="arm_item2_valore")
+
+    if st.button("✅ Registra Item 2", key="btn_item2", use_container_width=True):
+        if registra_armeria("item2", arm_item2_valore):
+            st.session_state.messaggio_ok = "Item 2 aggiornato"
+            st.session_state.reset_armeria_flag = True
+            st.rerun()
+
+with col6:
+    st.markdown("## 📦 Item 3")
+    arm_item3_valore = st.number_input("Quantità Item 3 (+ / -)", step=1.0, key="arm_item3_valore")
+
+    if st.button("✅ Registra Item 3", key="btn_item3", use_container_width=True):
+        if registra_armeria("item3", arm_item3_valore):
+            st.session_state.messaggio_ok = "Item 3 aggiornato"
+            st.session_state.reset_armeria_flag = True
             st.rerun()
