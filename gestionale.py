@@ -131,24 +131,35 @@ def normalizza_deposito(deposito):
     if not isinstance(deposito, dict):
         return {"items": {}}
 
-    # Caso 1: formato corretto {"items": {...}}
+    def converti_valore(v):
+        if isinstance(v, (int, float)):
+            return float(v)
+        if isinstance(v, str):
+            try:
+                return float(v.strip().replace(",", "."))
+            except Exception:
+                return None
+        return None
+
+    # Caso 1: formato {"items": {...}}
     if "items" in deposito:
         items = parse_json_safely(deposito["items"])
 
         if isinstance(items, dict):
-            items_puliti = {
-                str(k).strip().lower(): float(v)
-                for k, v in items.items()
-                if isinstance(v, (int, float))
-            }
+            items_puliti = {}
+            for k, v in items.items():
+                valore = converti_valore(v)
+                if valore is not None:
+                    items_puliti[str(k).strip().lower()] = valore
+
             return {"items": items_puliti}
 
-    # Caso 2: formato vecchio {"foglie":100, "panetti":20}
-    items_puliti = {
-        str(k).strip().lower(): float(v)
-        for k, v in deposito.items()
-        if isinstance(v, (int, float))
-    }
+    # Caso 2: formato vecchio {"foglie":100} oppure {"foglie":"100"}
+    items_puliti = {}
+    for k, v in deposito.items():
+        valore = converti_valore(v)
+        if valore is not None:
+            items_puliti[str(k).strip().lower()] = valore
 
     return {"items": items_puliti}
 
