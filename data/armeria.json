@@ -1,1 +1,6 @@
-
+{
+    "pistola": 0,
+    "silenziatore": 0,
+    "caricatori": 0,
+    "movimenti": []
+}
