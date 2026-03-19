@@ -3,10 +3,6 @@ from datetime import datetime
 import requests
 import json
 import base64
-import os
-import sys
-
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 st.set_page_config(layout="wide", page_title="Inserimento Finanze", page_icon="📝")
 
@@ -27,9 +23,6 @@ HEADERS = {
     "Accept": "application/vnd.github+json"
 }
 
-# -------------------------------
-# DEFAULT DATI
-# -------------------------------
 DEFAULT_DATI = {
     "cassa": 0,
     "fondo_cassa": 0,
@@ -58,14 +51,10 @@ def leggi_file_github():
             if not isinstance(dati, dict):
                 return DEFAULT_DATI.copy()
 
-            if "cassa" not in dati:
-                dati["cassa"] = 0
-            if "fondo_cassa" not in dati:
-                dati["fondo_cassa"] = 0
-            if "soldi_sporchi" not in dati:
-                dati["soldi_sporchi"] = 0
-            if "movimenti" not in dati or not isinstance(dati["movimenti"], list):
-                dati["movimenti"] = []
+            dati.setdefault("cassa", 0)
+            dati.setdefault("fondo_cassa", 0)
+            dati.setdefault("soldi_sporchi", 0)
+            dati.setdefault("movimenti", [])
 
             return dati
 
@@ -114,18 +103,8 @@ def aggiorna_file_github(dati):
 if "dati_finanze" not in st.session_state:
     st.session_state.dati_finanze = leggi_file_github()
 
-
-# -------------------------------
-# RESET CAMPI
-# -------------------------------
-def reset_finanze():
-    st.session_state.cassa_causale = ""
-    st.session_state.cassa_valore = 0.0
-    st.session_state.ss_causale = ""
-    st.session_state.ss_valore = 0.0
-    st.session_state.fc_causale = ""
-    st.session_state.fc_valore = 0.0
-
+if "reset_finanze_flag" not in st.session_state:
+    st.session_state.reset_finanze_flag = False
 
 defaults = {
     "cassa_causale": "",
@@ -134,11 +113,22 @@ defaults = {
     "ss_valore": 0.0,
     "fc_causale": "",
     "fc_valore": 0.0,
+    "messaggio_ok": ""
 }
 
 for k, v in defaults.items():
     if k not in st.session_state:
         st.session_state[k] = v
+
+# reset sicuro PRIMA dei widget
+if st.session_state.reset_finanze_flag:
+    st.session_state.cassa_causale = ""
+    st.session_state.cassa_valore = 0.0
+    st.session_state.ss_causale = ""
+    st.session_state.ss_valore = 0.0
+    st.session_state.fc_causale = ""
+    st.session_state.fc_valore = 0.0
+    st.session_state.reset_finanze_flag = False
 
 
 # -------------------------------
@@ -185,49 +175,41 @@ def registra_movimento(tipo, causale, valore):
 st.title("📝 Inserimento Finanze")
 st.divider()
 
+if st.session_state.messaggio_ok:
+    st.success(st.session_state.messaggio_ok)
+    st.session_state.messaggio_ok = ""
+
 col1, col2, col3 = st.columns(3, gap="large")
 
 with col1:
     st.markdown("## 💰 Cassa")
     cassa_causale = st.text_input("Causale Cassa", key="cassa_causale")
-    cassa_valore = st.number_input(
-        "Importo Cassa (+ / -)",
-        step=1.0,
-        key="cassa_valore"
-    )
+    cassa_valore = st.number_input("Importo Cassa (+ / -)", step=1.0, key="cassa_valore")
 
     if st.button("✅ Registra Cassa", key="btn_cassa", use_container_width=True):
         if registra_movimento("cassa", cassa_causale, cassa_valore):
-            reset_finanze()
-            st.success("Movimento Cassa registrato")
+            st.session_state.messaggio_ok = "Movimento Cassa registrato"
+            st.session_state.reset_finanze_flag = True
             st.rerun()
 
 with col2:
     st.markdown("## 💸 Soldi Sporchi")
     ss_causale = st.text_input("Causale Soldi Sporchi", key="ss_causale")
-    ss_valore = st.number_input(
-        "Importo Soldi Sporchi (+ / -)",
-        step=1.0,
-        key="ss_valore"
-    )
+    ss_valore = st.number_input("Importo Soldi Sporchi (+ / -)", step=1.0, key="ss_valore")
 
     if st.button("✅ Registra Soldi Sporchi", key="btn_ss", use_container_width=True):
         if registra_movimento("soldi_sporchi", ss_causale, ss_valore):
-            reset_finanze()
-            st.success("Movimento Soldi Sporchi registrato")
+            st.session_state.messaggio_ok = "Movimento Soldi Sporchi registrato"
+            st.session_state.reset_finanze_flag = True
             st.rerun()
 
 with col3:
     st.markdown("## 💼 Fondo Cassa")
     fc_causale = st.text_input("Causale Fondo Cassa", key="fc_causale")
-    fc_valore = st.number_input(
-        "Importo Fondo Cassa (+ / -)",
-        step=1.0,
-        key="fc_valore"
-    )
+    fc_valore = st.number_input("Importo Fondo Cassa (+ / -)", step=1.0, key="fc_valore")
 
     if st.button("✅ Registra Fondo Cassa", key="btn_fc", use_container_width=True):
         if registra_movimento("fondo_cassa", fc_causale, fc_valore):
-            reset_finanze()
-            st.success("Movimento Fondo Cassa registrato")
+            st.session_state.messaggio_ok = "Movimento Fondo Cassa registrato"
+            st.session_state.reset_finanze_flag = True
             st.rerun()
