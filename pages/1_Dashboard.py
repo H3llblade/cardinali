@@ -4,6 +4,9 @@ from gestionale import formatta, aggiorna_dati_da_github
 
 st.set_page_config(layout="wide")
 
+# =========================
+# AUTO REFRESH
+# =========================
 if "last_refresh" not in st.session_state:
     st.session_state.last_refresh = time.time()
 
@@ -11,13 +14,9 @@ if time.time() - st.session_state.last_refresh > 5:
     st.session_state.last_refresh = time.time()
     st.rerun()
 
-aggiorna_dati_da_github()
-
-finanze = st.session_state.get("finanze", {})
-deposito = st.session_state.get("deposito", {})
-
-items = {}
-
+# =========================
+# FUNZIONI UTILI
+# =========================
 def converti_valore(v):
     if isinstance(v, (int, float)):
         return float(v)
@@ -28,17 +27,43 @@ def converti_valore(v):
             return None
     return None
 
-if isinstance(deposito, dict):
-    raw_items = deposito.get("items", deposito)
 
-    if isinstance(raw_items, dict):
-        items_puliti = {}
-        for k, v in raw_items.items():
-            valore = converti_valore(v)
-            if valore is not None:
-                items_puliti[str(k).strip().lower()] = valore
-        items = items_puliti
+def estrai_items_deposito(deposito):
+    """
+    Supporta sia:
+    1) {"items": {"foglie": 100}}
+    2) {"foglie": 100}
+    3) valori numerici anche come stringa
+    """
+    if not isinstance(deposito, dict):
+        return {}
 
+    sorgente = deposito.get("items", deposito)
+
+    if not isinstance(sorgente, dict):
+        return {}
+
+    items_puliti = {}
+    for k, v in sorgente.items():
+        valore = converti_valore(v)
+        if valore is not None:
+            items_puliti[str(k).strip().lower()] = valore
+
+    return items_puliti
+
+
+# =========================
+# CARICAMENTO DATI
+# =========================
+aggiorna_dati_da_github()
+
+finanze = st.session_state.get("finanze", {})
+deposito = st.session_state.get("deposito", {})
+items = estrai_items_deposito(deposito)
+
+# =========================
+# STILE
+# =========================
 st.markdown("""
 <style>
 .block-container {
@@ -46,6 +71,7 @@ st.markdown("""
     padding-bottom: 2rem;
     max-width: 100%;
 }
+
 .card {
     background-color: #1E1E1E;
     padding: 25px;
@@ -58,18 +84,21 @@ st.markdown("""
     flex-direction: column;
     justify-content: center;
 }
+
 .card h3 {
     margin: 0 0 10px 0;
     color: #CFCFCF;
     font-size: 20px;
     font-weight: 600;
 }
+
 .card h1 {
     margin: 0;
     font-size: 34px;
     color: white;
     font-weight: 800;
 }
+
 .section-title {
     font-size: 28px;
     font-weight: 700;
@@ -80,6 +109,9 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# =========================
+# TITOLO
+# =========================
 st.markdown(
     "<h1 style='text-align:center; color:white;'>🦅 CARDINALI</h1>",
     unsafe_allow_html=True
@@ -87,6 +119,9 @@ st.markdown(
 
 st.divider()
 
+# =========================
+# REGISTRO FINANZE
+# =========================
 st.markdown("<div class='section-title'>💰 Registro Finanze</div>", unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns(3, gap="large")
@@ -117,6 +152,9 @@ with col3:
 
 st.divider()
 
+# =========================
+# DEPOSITO
+# =========================
 st.markdown("<div class='section-title'>📦 Deposito</div>", unsafe_allow_html=True)
 
 if items:
@@ -143,15 +181,9 @@ else:
 
 st.divider()
 
-col1, col2, col3 = st.columns([1, 1, 4])
+col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 4])
 
-with col2:
+with col_btn2:
     if st.button("🔄 Aggiorna ora", use_container_width=True):
         aggiorna_dati_da_github()
         st.rerun()
-
-with st.expander("Debug deposito"):
-    st.write("st.session_state.deposito")
-    st.json(deposito)
-    st.write("items visualizzati")
-    st.json(items)
