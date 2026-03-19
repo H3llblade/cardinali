@@ -96,6 +96,35 @@ def estrai_items_deposito(deposito):
 
     return items_puliti
 
+
+def render_sezione_items(titolo, dati_items, warning_text):
+    st.markdown(f"<div class='section-title'>{titolo}</div>", unsafe_allow_html=True)
+
+    if dati_items:
+        lista_items = list(dati_items.items())
+
+        for i in range(0, len(lista_items), 3):
+            blocco = lista_items[i:i+3]
+            cols = st.columns(3, gap="large")
+
+            for j in range(3):
+                with cols[j]:
+                    if j < len(blocco):
+                        nome, valore = blocco[j]
+                        st.markdown(f"""
+                        <div class="card">
+                            <h3>{nome.replace("_", " ").title()}</h3>
+                            <h1>{formatta(valore)}</h1>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    else:
+                        st.empty()
+    else:
+        st.warning(warning_text)
+
+    st.divider()
+
+
 # =========================
 # CARICAMENTO DATI
 # =========================
@@ -115,6 +144,9 @@ armeria = leggi_file_github(ARMERIA_FILE, {
 
 deposito = leggi_file_github(DEPOSITO_FILE, {"items": {}})
 items = estrai_items_deposito(deposito)
+
+droghe = leggi_file_github(DRUGS_FILE, {"items": {}})
+drugs = estrai_items_deposito(droghe)
 
 # =========================
 # STILE
@@ -249,60 +281,20 @@ st.divider()
 # =========================
 # DEPOSITO DROGHE
 # =========================
-st.markdown("<div class='section-title'>📦 Deposito Droghe</div>", unsafe_allow_html=True)
-
-if items:
-    lista_items = list(items.items())
-
-    for i in range(0, len(lista_items), 3):
-        blocco = lista_items[i:i+3]
-        cols = st.columns(3, gap="large")
-
-        for j in range(3):
-            with cols[j]:
-                if j < len(blocco):
-                    nome, valore = blocco[j]
-                    st.markdown(f"""
-                    <div class="card">
-                        <h3>{nome.replace("_", " ").title()}</h3>
-                        <h1>{formatta(valore)}</h1>
-                    </div>
-                    """, unsafe_allow_html=True)
-                else:
-                    st.empty()
-else:
-    st.warning("Nessun elemento presente nel deposito.")
-
-st.divider()
+render_sezione_items(
+    "📦 Deposito Droghe",
+    drugs,
+    "Nessun elemento presente nel deposito droghe."
+)
 
 # =========================
 # DEPOSITO
 # =========================
-st.markdown("<div class='section-title'>📦 Deposito</div>", unsafe_allow_html=True)
-
-if items:
-    lista_items = list(items.items())
-
-    for i in range(0, len(lista_items), 3):
-        blocco = lista_items[i:i+3]
-        cols = st.columns(3, gap="large")
-
-        for j in range(3):
-            with cols[j]:
-                if j < len(blocco):
-                    nome, valore = blocco[j]
-                    st.markdown(f"""
-                    <div class="card">
-                        <h3>{nome.replace("_", " ").title()}</h3>
-                        <h1>{formatta(valore)}</h1>
-                    </div>
-                    """, unsafe_allow_html=True)
-                else:
-                    st.empty()
-else:
-    st.warning("Nessun elemento presente nel deposito.")
-
-st.divider()
+render_sezione_items(
+    "📦 Deposito",
+    items,
+    "Nessun elemento presente nel deposito."
+)
 
 # =========================
 # BOTTONE CENTRATO
