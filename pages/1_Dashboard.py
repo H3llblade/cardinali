@@ -1,7 +1,18 @@
 import streamlit as st
+import time
 from gestionale import formatta, aggiorna_dati_da_github
 
 st.set_page_config(layout="wide")
+
+# =========================
+# AUTO REFRESH
+# =========================
+if "last_refresh" not in st.session_state:
+    st.session_state.last_refresh = time.time()
+
+if time.time() - st.session_state.last_refresh > 5:
+    st.session_state.last_refresh = time.time()
+    st.rerun()
 
 # =========================
 # CARICAMENTO DATI
@@ -11,14 +22,14 @@ aggiorna_dati_da_github()
 finanze = st.session_state.get("finanze", {})
 deposito = st.session_state.get("deposito", {})
 
-# Compatibilità doppio formato:
-# 1) {"items": {"foglie": 100}}
-# 2) {"foglie": 100}
 if isinstance(deposito, dict):
     if "items" in deposito and isinstance(deposito["items"], dict):
         items = deposito["items"]
     else:
-        items = deposito
+        items = {
+            k: v for k, v in deposito.items()
+            if isinstance(v, (int, float))
+        }
 else:
     items = {}
 
@@ -32,6 +43,7 @@ st.markdown("""
     padding-bottom: 2rem;
     max-width: 100%;
 }
+
 .card {
     background-color: #1E1E1E;
     padding: 25px;
@@ -44,18 +56,21 @@ st.markdown("""
     flex-direction: column;
     justify-content: center;
 }
+
 .card h3 {
     margin: 0 0 10px 0;
     color: #CFCFCF;
     font-size: 20px;
     font-weight: 600;
 }
+
 .card h1 {
     margin: 0;
     font-size: 34px;
     color: white;
     font-weight: 800;
 }
+
 .section-title {
     font-size: 28px;
     font-weight: 700;
@@ -114,7 +129,7 @@ st.divider()
 # =========================
 st.markdown("<div class='section-title'>📦 Deposito</div>", unsafe_allow_html=True)
 
-if items and isinstance(items, dict):
+if items:
     lista_items = list(items.items())
 
     for i in range(0, len(lista_items), 3):
@@ -131,21 +146,22 @@ if items and isinstance(items, dict):
                         <h1>{formatta(valore)}</h1>
                     </div>
                     """, unsafe_allow_html=True)
+                else:
+                    st.empty()
 else:
     st.warning("Deposito vuoto oppure struttura dati non riconosciuta.")
 
 st.divider()
 
-col1, col2 = st.columns([1, 4])
+col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 4])
 
-with col1:
+with col_btn2:
     if st.button("🔄 Aggiorna ora", use_container_width=True):
         aggiorna_dati_da_github()
         st.rerun()
 
-with col2:
-    with st.expander("Debug dati deposito"):
-        st.write("st.session_state.deposito:")
-        st.json(deposito)
-        st.write("items usati dalla dashboard:")
-        st.json(items)
+with st.expander("Debug dati deposito"):
+    st.write("Contenuto completo di st.session_state.deposito:")
+    st.json(deposito)
+    st.write("Items letti dalla dashboard:")
+    st.json(items)
