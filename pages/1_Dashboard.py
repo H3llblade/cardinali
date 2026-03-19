@@ -252,7 +252,7 @@ st.divider()
 st.markdown("<div class='section-title'>📦 Deposito Droghe</div>", unsafe_allow_html=True)
 
 if items:
-    lista_items = list(items.drugs())
+    lista_items = list(items.items())
 
     for i in range(0, len(lista_items), 3):
         blocco = lista_items[i:i+3]
