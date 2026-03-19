@@ -1,7 +1,7 @@
 {
     "pistola": 2.0,
     "silenziatore": 0,
-    "caricatore": 0,
+    "caricatore": 6.0,
     "movimenti": [
         {
             "data": "19/03/2026 04:12:49",
@@ -9,6 +9,13 @@
             "item": "pistola",
             "causale": "BERETTA  al 19/03/26",
             "valore": 2.0
+        },
+        {
+            "data": "19/03/2026 04:14:05",
+            "tipo": "armeria",
+            "item": "caricatore",
+            "causale": "+ Caricatori estesi",
+            "valore": 6.0
         }
     ]
 }
