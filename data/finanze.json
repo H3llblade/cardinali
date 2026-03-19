@@ -1,6 +1,13 @@
 {
-    "cassa": 0,
-    "soldi_sporchi": 0,
+    "cassa": 500000.0,
     "fondo_cassa": 0,
-    "movimenti": []
+    "soldi_sporchi": 0,
+    "movimenti": [
+        {
+            "data": "19/03/2026 02:07:24",
+            "tipo": "cassa",
+            "causale": "vendita 10 sns",
+            "valore": 500000.0
+        }
+    ]
 }
