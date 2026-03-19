@@ -299,34 +299,34 @@ st.subheader("🪖 Gestione Armeria")
 col4, col5, col6 = st.columns(3, gap="large")
 
 with col4:
-    st.markdown("## 🔫 Item 1")
-    arm_item1_causale = st.text_input("Causale Item 1", key="arm_item1_causale")
-    arm_item1_valore = st.number_input("Quantità Item 1 (+ / -)", step=1.0, key="arm_item1_valore")
+    st.markdown("## 🔫 Pistola")
+    arm_item1_causale = st.text_input("Causale Pistola", key="arm_pistola_causale")
+    arm_item1_valore = st.number_input("Quantità Pistola (+ / -)", step=1.0, key="arm_pistola_valore")
 
-    if st.button("✅ Registra Item 1", key="btn_item1", use_container_width=True):
-        if registra_armeria("item1", arm_item1_causale, arm_item1_valore):
-            st.session_state.messaggio_ok = "Item 1 aggiornato"
+    if st.button("✅ Registra Pistola", key="btn_pistola", use_container_width=True):
+        if registra_armeria("pistola", arm_pistola_causale, arm_pistola_valore):
+            st.session_state.messaggio_ok = "Pistola aggiornato"
             st.session_state.reset_armeria_flag = True
             st.rerun()
 
 with col5:
-    st.markdown("## 🧰 Item 2")
-    arm_item2_causale = st.text_input("Causale Item 2", key="arm_item2_causale")
-    arm_item2_valore = st.number_input("Quantità Item 2 (+ / -)", step=1.0, key="arm_item2_valore")
+    st.markdown("## 🧰 Silenziatore")
+    arm_item2_causale = st.text_input("Causale Silenziatore", key="arm_silenziatore_causale")
+    arm_item2_valore = st.number_input("Quantità Silenziatore (+ / -)", step=1.0, key="arm_silenziatore_valore")
 
-    if st.button("✅ Registra Item 2", key="btn_item2", use_container_width=True):
-        if registra_armeria("item2", arm_item2_causale, arm_item2_valore):
-            st.session_state.messaggio_ok = "Item 2 aggiornato"
+    if st.button("✅ Registra Silenziatore", key="btn_item2", use_container_width=True):
+        if registra_armeria("silenziatore", arm_silenziatore_causale, arm_silenziatore_valore):
+            st.session_state.messaggio_ok = "Silenziatore aggiornato"
             st.session_state.reset_armeria_flag = True
             st.rerun()
 
 with col6:
-    st.markdown("## 📦 Item 3")
-    arm_item3_causale = st.text_input("Causale Item 3", key="arm_item3_causale")
-    arm_item3_valore = st.number_input("Quantità Item 3 (+ / -)", step=1.0, key="arm_item3_valore")
+    st.markdown("## 📦 Caricatore")
+    arm_item3_causale = st.text_input("Causale Caricatore", key="arm_caricatore_causale")
+    arm_item3_valore = st.number_input("Quantità Caricatore (+ / -)", step=1.0, key="arm_caricatore_valore")
 
-    if st.button("✅ Registra Item 3", key="btn_item3", use_container_width=True):
-        if registra_armeria("item3", arm_item3_causale, arm_item3_valore):
-            st.session_state.messaggio_ok = "Item 3 aggiornato"
+    if st.button("✅ Registra Caricatore", key="btn_caricatore", use_container_width=True):
+        if registra_armeria("caricatore", arm_caricatore_causale, arm_caricatore_valore):
+            st.session_state.messaggio_ok = "Caricatore aggiornato"
             st.session_state.reset_armeria_flag = True
             st.rerun()
