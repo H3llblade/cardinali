@@ -2,18 +2,5 @@
     "cassa": 1120.0,
     "fondo_cassa": 0,
     "soldi_sporchi": 0,
-    "movimenti": [
-        {
-            "data": "19/03/2026 02:39:30",
-            "tipo": "cassa",
-            "causale": "test",
-            "valore": 1110.0
-        },
-        {
-            "data": "19/03/2026 02:39:44",
-            "tipo": "cassa",
-            "causale": "test",
-            "valore": 10.0
-        }
-    ]
+    "movimenti": []
 }
