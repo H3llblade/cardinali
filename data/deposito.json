@@ -1,6 +1,7 @@
 {
     "items": {
         "foglie": 200,
-        "panetti": 100.0
+        "panetti": 100.0,
+        "canne": 100.0
     }
 }
