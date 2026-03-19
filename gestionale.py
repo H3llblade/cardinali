@@ -4,17 +4,11 @@ import requests
 import json
 import base64
 
-# =========================
-# CONFIG PAGINA
-# =========================
 try:
     st.set_page_config(layout="wide", page_title="CARDINALI", page_icon="🦅")
 except Exception:
     pass
 
-# =========================
-# CONFIG GITHUB
-# =========================
 GITHUB_REPO_OWNER = st.secrets["GITHUB_OWNER"]
 GITHUB_REPO_NAME = st.secrets["GITHUB_REPO"]
 GITHUB_TOKEN = st.secrets["GITHUB_PAT"]
@@ -26,15 +20,8 @@ HEADERS = {
 
 FINANZE_FILE = "data/finanze.json"
 DEPOSITO_FILE = "data/deposito.json"
-
-# =========================
-# CONFIG DISCORD WEBHOOK
-# =========================
 WEBHOOK_URL = st.secrets.get("DISCORD_WEBHOOK_URL", "")
 
-# =========================
-# DEFAULT DATA
-# =========================
 DEFAULT_FINANZE = {
     "cassa": 0,
     "fondo_cassa": 0,
@@ -46,9 +33,23 @@ DEFAULT_DEPOSITO = {
     "items": {}
 }
 
-# =========================
-# FUNZIONI GITHUB
-# =========================
+
+def parse_json_safely(value):
+    """Converte stringhe JSON annidate in oggetti Python."""
+    current = value
+
+    for _ in range(3):
+        if isinstance(current, str):
+            try:
+                current = json.loads(current)
+            except Exception:
+                break
+        else:
+            break
+
+    return current
+
+
 def leggi_file_github(file_path, default_data):
     url = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/{file_path}"
 
@@ -58,7 +59,7 @@ def leggi_file_github(file_path, default_data):
         if r.status_code == 200:
             content = r.json()["content"]
             decoded = base64.b64decode(content).decode("utf-8")
-            dati = json.loads(decoded)
+            dati = parse_json_safely(decoded)
 
             if not isinstance(dati, dict):
                 return default_data.copy()
@@ -99,9 +100,6 @@ def aggiorna_file_github(file_path, dati, messaggio_commit):
         st.error(f"Errore aggiornamento GitHub su {file_path}: {e}")
 
 
-# =========================
-# UTILS
-# =========================
 def formatta(num):
     try:
         return f"{round(float(num)):,}".replace(",", ".")
@@ -127,29 +125,34 @@ def invia_discord(tipo, causale, valore, totale):
         pass
 
 
-# =========================
-# NORMALIZZAZIONE DEPOSITO
-# =========================
 def normalizza_deposito(deposito):
+    deposito = parse_json_safely(deposito)
+
     if not isinstance(deposito, dict):
-        return DEFAULT_DEPOSITO.copy()
+        return {"items": {}}
 
-    # formato nuovo già corretto
-    if "items" in deposito and isinstance(deposito["items"], dict):
-        return {"items": deposito["items"]}
+    # Caso 1: formato corretto {"items": {...}}
+    if "items" in deposito:
+        items = parse_json_safely(deposito["items"])
 
-    # formato vecchio: {"foglie": 100, "panetti": 20}
-    items = {
-        k: v for k, v in deposito.items()
+        if isinstance(items, dict):
+            items_puliti = {
+                str(k).strip().lower(): float(v)
+                for k, v in items.items()
+                if isinstance(v, (int, float))
+            }
+            return {"items": items_puliti}
+
+    # Caso 2: formato vecchio {"foglie":100, "panetti":20}
+    items_puliti = {
+        str(k).strip().lower(): float(v)
+        for k, v in deposito.items()
         if isinstance(v, (int, float))
     }
 
-    return {"items": items}
+    return {"items": items_puliti}
 
 
-# =========================
-# CARICAMENTO DATI
-# =========================
 def carica_dati():
     finanze = leggi_file_github(FINANZE_FILE, DEFAULT_FINANZE)
     deposito = leggi_file_github(DEPOSITO_FILE, DEFAULT_DEPOSITO)
@@ -176,9 +179,6 @@ if "deposito" not in st.session_state:
 carica_dati()
 
 
-# =========================
-# FINANZE
-# =========================
 def registra_movimento(tipo, causale, valore):
     if tipo not in ["cassa", "soldi_sporchi", "fondo_cassa"]:
         st.error(f"Tipo non valido: {tipo}")
@@ -218,9 +218,6 @@ def registra_movimento(tipo, causale, valore):
     return True
 
 
-# =========================
-# DEPOSITO DINAMICO
-# =========================
 def registra_deposito(nome_articolo, quantita):
     try:
         nome_articolo = str(nome_articolo).strip().lower()
@@ -233,8 +230,7 @@ def registra_deposito(nome_articolo, quantita):
         st.error("Inserisci un nome articolo valido.")
         return False
 
-    deposito = st.session_state.get("deposito", DEFAULT_DEPOSITO.copy())
-    deposito = normalizza_deposito(deposito)
+    deposito = normalizza_deposito(st.session_state.get("deposito", DEFAULT_DEPOSITO.copy()))
 
     if nome_articolo not in deposito["items"]:
         deposito["items"][nome_articolo] = 0
