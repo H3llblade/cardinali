@@ -188,8 +188,6 @@ if "finanze" not in st.session_state:
 if "deposito" not in st.session_state:
     st.session_state.deposito = DEFAULT_DEPOSITO.copy()
 
-carica_dati()
-
 
 def registra_movimento(tipo, causale, valore):
     if tipo not in ["cassa", "soldi_sporchi", "fondo_cassa"]:
