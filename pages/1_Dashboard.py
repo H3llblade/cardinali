@@ -3,12 +3,16 @@ import time
 from gestionale import formatta, aggiorna_dati_da_github
 
 # =========================
-# AUTO REFRESH (senza librerie)
+# CONFIG PAGINA
+# =========================
+st.set_page_config(layout="wide")
+
+# =========================
+# AUTO REFRESH
 # =========================
 if "last_refresh" not in st.session_state:
     st.session_state.last_refresh = time.time()
 
-# ogni 5 secondi aggiorna
 if time.time() - st.session_state.last_refresh > 5:
     st.session_state.last_refresh = time.time()
     st.rerun()
@@ -22,7 +26,36 @@ finanze = st.session_state.get("finanze", {})
 coca = st.session_state.get("coca", {})
 
 # =========================
-# UI
+# STILE CSS
+# =========================
+st.markdown("""
+<style>
+.card {
+    background-color: #1E1E1E;
+    padding: 25px;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+}
+.card h3 {
+    margin-bottom: 10px;
+    color: #bbbbbb;
+}
+.card h1 {
+    margin: 0;
+    font-size: 36px;
+    color: white;
+}
+.section-title {
+    font-size: 26px;
+    color: white;
+    margin-top: 20px;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# =========================
+# TITOLO
 # =========================
 st.markdown(
     "<h1 style='text-align:center; color:white;'>🦅 CARDINALI</h1>",
@@ -34,40 +67,74 @@ st.divider()
 # =========================
 # REGISTRO FINANZE
 # =========================
-st.markdown(
-    "<h2 style='color:white;'>💰 Registro Finanze</h2>",
-    unsafe_allow_html=True
-)
-
+st.markdown("<div class='section-title'>💰 Registro Finanze</div>", unsafe_allow_html=True)
 st.divider()
 
-col1, col2, col3 = st.columns(3)
+col1, col2, col3 = st.columns(3, gap="large")
 
-col1.metric("💰 Cassa", f"{formatta(finanze.get('cassa', 0))} $")
-col2.metric("💸 Soldi Sporchi", f"{formatta(finanze.get('soldi_sporchi', 0))} $")
-col3.metric("💼 Fondo Cassa", f"{formatta(finanze.get('fondo_cassa', 0))} $")
+with col1:
+    st.markdown(f"""
+    <div class="card">
+        <h3>💰 Cassa</h3>
+        <h1>{formatta(finanze.get('cassa', 0))} $</h1>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col2:
+    st.markdown(f"""
+    <div class="card">
+        <h3>💸 Soldi Sporchi</h3>
+        <h1>{formatta(finanze.get('soldi_sporchi', 0))} $</h1>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col3:
+    st.markdown(f"""
+    <div class="card">
+        <h3>💼 Fondo Cassa</h3>
+        <h1>{formatta(finanze.get('fondo_cassa', 0))} $</h1>
+    </div>
+    """, unsafe_allow_html=True)
 
 st.divider()
 
 # =========================
 # PROCESSO COCA
 # =========================
-st.markdown(
-    "<h2 style='color:white;'>🌿 Processo Coca</h2>",
-    unsafe_allow_html=True
-)
+st.markdown("<div class='section-title'>🌿 Processo Coca</div>", unsafe_allow_html=True)
+st.divider()
+
+col4, col5, col6 = st.columns(3, gap="large")
+
+with col4:
+    st.markdown(f"""
+    <div class="card">
+        <h3>🍃 Foglie</h3>
+        <h1>{formatta(coca.get('foglie', 0))}</h1>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col5:
+    st.markdown(f"""
+    <div class="card">
+        <h3>🧱 Panetti</h3>
+        <h1>{formatta(coca.get('panetti', 0))}</h1>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col6:
+    st.markdown(f"""
+    <div class="card">
+        <h3>💊 Bustine</h3>
+        <h1>{formatta(coca.get('bustine', 0))}</h1>
+    </div>
+    """, unsafe_allow_html=True)
 
 st.divider()
 
-col4, col5, col6 = st.columns(3)
-
-col4.metric("🍃 Foglie", formatta(coca.get("foglie", 0)))
-col5.metric("🧱 Panetti", formatta(coca.get("panetti", 0)))
-col6.metric("💊 Bustine", formatta(coca.get("bustine", 0)))
-
-st.divider()
-
-# refresh manuale
+# =========================
+# REFRESH MANUALE
+# =========================
 if st.button("🔄 Aggiorna ora"):
     aggiorna_dati_da_github()
     st.rerun()
