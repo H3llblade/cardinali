@@ -251,11 +251,11 @@ st.divider()
 # =========================
 st.markdown("<div class='section-title'>📦 Deposito Droghe</div>", unsafe_allow_html=True)
 
-if drugs:
-    lista_drugs = list(drugs.drugs())
+if items:
+    lista_items = list(items.drugs())
 
-    for i in range(0, len(lista_drugs), 3):
-        blocco = lista_drugs[i:i+3]
+    for i in range(0, len(lista_items), 3):
+        blocco = lista_items[i:i+3]
         cols = st.columns(3, gap="large")
 
         for j in range(3):
