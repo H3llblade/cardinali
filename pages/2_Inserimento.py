@@ -124,12 +124,12 @@ defaults = {
     "ss_valore": 0.0,
     "fc_causale": "",
     "fc_valore": 0.0,
-    "arm_item1_causale": "",
-    "arm_item1_valore": 0.0,
-    "arm_item2_causale": "",
-    "arm_item2_valore": 0.0,
-    "arm_item3_causale": "",
-    "arm_item3_valore": 0.0,
+    "arm_pistola_causale": "",
+    "arm_pistola_valore": 0.0,
+    "arm_silenziatore_causale": "",
+    "arm_silenziatore_valore": 0.0,
+    "arm_caricatore_causale": "",
+    "arm_caricatore_valore": 0.0,
 }
 
 for k, v in defaults.items():
@@ -147,12 +147,12 @@ if st.session_state.reset_finanze_flag:
     st.session_state.reset_finanze_flag = False
 
 if st.session_state.reset_armeria_flag:
-    st.session_state.arm_item1_causale = ""
-    st.session_state.arm_item1_valore = 0.0
-    st.session_state.arm_item2_causale = ""
-    st.session_state.arm_item2_valore = 0.0
-    st.session_state.arm_item3_causale = ""
-    st.session_state.arm_item3_valore = 0.0
+    st.session_state.arm_pistola_causale = ""
+    st.session_state.arm_pistola_valore = 0.0
+    st.session_state.arm_silenziatore_causale = ""
+    st.session_state.arm_silenziatore_valore = 0.0
+    st.session_state.arm_caricatore_causale = ""
+    st.session_state.arm_caricatore_valore = 0.0
     st.session_state.reset_armeria_flag = False
 
 
