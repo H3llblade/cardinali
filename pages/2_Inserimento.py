@@ -3,6 +3,7 @@ import os
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
+import streamlit as st
 from gestionale import registra_movimento, registra_deposito
 
 st.set_page_config(layout="wide")
