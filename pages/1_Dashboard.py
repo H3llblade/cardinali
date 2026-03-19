@@ -247,6 +247,35 @@ with col_arm3:
 st.divider()
 
 # =========================
+# DEPOSITO DROGHE
+# =========================
+st.markdown("<div class='section-title'>📦 Deposito Droghe</div>", unsafe_allow_html=True)
+
+if drugs:
+    lista_drugs = list(drugs.drugs())
+
+    for i in range(0, len(lista_drugs), 3):
+        blocco = lista_drugs[i:i+3]
+        cols = st.columns(3, gap="large")
+
+        for j in range(3):
+            with cols[j]:
+                if j < len(blocco):
+                    nome, valore = blocco[j]
+                    st.markdown(f"""
+                    <div class="card">
+                        <h3>{nome.replace("_", " ").title()}</h3>
+                        <h1>{formatta(valore)}</h1>
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.empty()
+else:
+    st.warning("Nessun elemento presente nel deposito.")
+
+st.divider()
+
+# =========================
 # DEPOSITO
 # =========================
 st.markdown("<div class='section-title'>📦 Deposito</div>", unsafe_allow_html=True)
