@@ -9,9 +9,10 @@ try:
 except Exception:
     pass
 
-GITHUB_REPO_OWNER = st.secrets["GITHUB_OWNER"]
-GITHUB_REPO_NAME = st.secrets["GITHUB_REPO"]
-GITHUB_TOKEN = st.secrets["GITHUB_PAT"]
+GITHUB_REPO_OWNER = st.secrets.get("GITHUB_OWNER", "")
+GITHUB_REPO_NAME = st.secrets.get("GITHUB_REPO", "")
+GITHUB_TOKEN = st.secrets.get("GITHUB_PAT", "")
+WEBHOOK_URL = st.secrets.get("DISCORD_WEBHOOK_URL", "")
 
 HEADERS = {
     "Authorization": f"token {GITHUB_TOKEN}",
