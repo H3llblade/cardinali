@@ -60,8 +60,7 @@ def leggi_file_github(file_path, default_data):
 
         return default_data
 
-    except Exception as e:
-        st.error(f"Errore lettura {file_path}: {e}")
+    except Exception:
         return default_data
 
 
@@ -80,9 +79,6 @@ def estrai_items_deposito(deposito):
     if not isinstance(deposito, dict):
         return {}
 
-    # Supporta:
-    # {"items": {"foglie": 100}}
-    # {"foglie": 100}
     sorgente = deposito.get("items", deposito)
 
     if not isinstance(sorgente, dict):
@@ -98,7 +94,7 @@ def estrai_items_deposito(deposito):
 
 
 # =========================
-# CARICAMENTO DATI DIRETTO
+# CARICAMENTO DATI
 # =========================
 finanze = leggi_file_github(FINANZE_FILE, {
     "cassa": 0,
@@ -155,6 +151,12 @@ st.markdown("""
     margin-top: 8px;
     margin-bottom: 12px;
 }
+
+.center-btn {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -169,7 +171,7 @@ st.markdown(
 st.divider()
 
 # =========================
-# REGISTRO FINANZE
+# FINANZE
 # =========================
 st.markdown("<div class='section-title'>💰 Registro Finanze</div>", unsafe_allow_html=True)
 
@@ -230,16 +232,10 @@ else:
 
 st.divider()
 
-col1, col2, col3 = st.columns([1, 1, 4])
-
-with col2:
-    if st.button("🔄 Aggiorna ora", use_container_width=True):
-        st.rerun()
-
-with st.expander("Debug deposito"):
-    st.write("Contenuto raw di deposito.json:")
-    st.json(deposito)
-    st.write("Items letti dalla dashboard:")
-    st.json(items)
-    st.write("Path letto:", DEPOSITO_FILE)
-    st.write("Repo letto:", f"{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}")
+# =========================
+# BOTTONE CENTRATO
+# =========================
+st.markdown("<div class='center-btn'>", unsafe_allow_html=True)
+if st.button("🔄 Aggiorna ora"):
+    st.rerun()
+st.markdown("</div>", unsafe_allow_html=True)
