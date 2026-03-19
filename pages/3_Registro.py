@@ -29,9 +29,9 @@ DEFAULT_FINANZE = {
 }
 
 DEFAULT_ARMERIA = {
-    "item1": 0,
-    "item2": 0,
-    "item3": 0,
+    "pistola": 0,
+    "silenziatore": 0,
+    "caricatore": 0,
     "movimenti": []
 }
 
