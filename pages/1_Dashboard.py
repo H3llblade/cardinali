@@ -21,7 +21,7 @@ aggiorna_dati_da_github()
 
 finanze = st.session_state.get("finanze", {})
 deposito = st.session_state.get("deposito", {})
-items = deposito.get("items", {})
+items = deposito.get("items", foglie)
 
 # =========================
 # STILE
