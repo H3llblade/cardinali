@@ -46,6 +46,12 @@ DEFAULT_DEPOSITO = {
     "items": {}
 }
 
+def carica_dati():
+    st.session_state.finanze = leggi_file_github(FINANZE_FILE, DEFAULT_FINANZE)
+    st.session_state.deposito = leggi_file_github(DEPOSITO_FILE, DEFAULT_DEPOSITO)
+
+def aggiorna_dati_da_github():
+    carica_dati()
 # =========================
 # FUNZIONI GITHUB
 # =========================
