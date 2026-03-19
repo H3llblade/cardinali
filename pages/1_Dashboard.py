@@ -114,7 +114,7 @@ armeria = leggi_file_github(ARMERIA_FILE, {
 })
 
 droghe = leggi_file_github(DRUGS_FILE, {"items": {}})
-drugs = estrai_items_droghe(droghe)
+items = estrai_items_droghe(deposito)
 
 deposito = leggi_file_github(DEPOSITO_FILE, {"items": {}})
 items = estrai_items_deposito(deposito)
