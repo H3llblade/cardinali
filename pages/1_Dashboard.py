@@ -21,6 +21,7 @@ HEADERS = {
 FINANZE_FILE = "data/finanze.json"
 ARMERIA_FILE = "data/armeria.json"
 DEPOSITO_FILE = "data/deposito.json"
+DRUGS_FILE = "data/drugs.json"
 
 # =========================
 # AUTO REFRESH
@@ -112,6 +113,9 @@ armeria = leggi_file_github(ARMERIA_FILE, {
     "caricatore": 0,
     "movimenti": []
 })
+
+droghe = leggi_file_github(DRUGS_FILE, {"items": {}})
+drugs = estrai_items_droghe(droghe)
 
 deposito = leggi_file_github(DEPOSITO_FILE, {"items": {}})
 items = estrai_items_deposito(deposito)
