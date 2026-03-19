@@ -96,7 +96,7 @@ def estrai_items_deposito(deposito):
 
     return items_puliti
 
-    def estrai_items_droghe(droghe):
+    def estrai_items_deposito(droghe):
     if not isinstance(droghe, dict):
         return {}
 
