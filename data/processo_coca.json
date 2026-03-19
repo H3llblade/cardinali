@@ -1,5 +1,7 @@
 {
-    "foglie": 0,
-    "panetti": 0,
-    "bustine": 0
+    "items": {
+        "foglie": 0,
+        "panetti": 0,
+        "bustine": 0
+    }
 }
