@@ -1,6 +1,14 @@
 {
-    "pistola": 0,
+    "pistola": 2.0,
     "silenziatore": 0,
     "caricatore": 0,
-    "movimenti": []
+    "movimenti": [
+        {
+            "data": "19/03/2026 03:55:50",
+            "tipo": "armeria",
+            "item": "pistola",
+            "causale": "start pistole BERETTA 9 mm",
+            "valore": 2.0
+        }
+    ]
 }
