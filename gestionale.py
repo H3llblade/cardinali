@@ -28,7 +28,7 @@ FINANZE_FILE = "data/finanze.json"
 DEPOSITO_FILE = "data/deposito.json"
 
 # =========================
-# CONFIG DISCORD
+# CONFIG DISCORD WEBHOOK
 # =========================
 WEBHOOK_URL = st.secrets.get("DISCORD_WEBHOOK_URL", "")
 
@@ -46,12 +46,6 @@ DEFAULT_DEPOSITO = {
     "items": {}
 }
 
-def carica_dati():
-    st.session_state.finanze = leggi_file_github(FINANZE_FILE, DEFAULT_FINANZE)
-    st.session_state.deposito = leggi_file_github(DEPOSITO_FILE, DEFAULT_DEPOSITO)
-
-def aggiorna_dati_da_github():
-    carica_dati()
 # =========================
 # FUNZIONI GITHUB
 # =========================
@@ -64,11 +58,17 @@ def leggi_file_github(file_path, default_data):
         if r.status_code == 200:
             content = r.json()["content"]
             decoded = base64.b64decode(content).decode("utf-8")
-            return json.loads(decoded)
+            dati = json.loads(decoded)
+
+            if not isinstance(dati, dict):
+                return default_data.copy()
+
+            return dati
 
         return default_data.copy()
 
-    except Exception:
+    except Exception as e:
+        print(f"Errore lettura GitHub ({file_path}): {e}")
         return default_data.copy()
 
 
@@ -100,21 +100,6 @@ def aggiorna_file_github(file_path, dati, messaggio_commit):
 
 
 # =========================
-# CARICAMENTO DATI
-# =========================
-def carica_dati():
-    st.session_state.finanze = leggi_file_github(FINANZE_FILE, DEFAULT_FINANZE)
-    st.session_state.deposito = leggi_file_github(DEPOSITO_FILE, DEFAULT_DEPOSITO)
-
-
-def aggiorna_dati_da_github():
-    carica_dati()
-
-
-if "finanze" not in st.session_state or "deposito" not in st.session_state:
-    carica_dati()
-
-# =========================
 # UTILS
 # =========================
 def formatta(num):
@@ -140,6 +125,55 @@ def invia_discord(tipo, causale, valore, totale):
         requests.post(WEBHOOK_URL, json={"content": msg}, timeout=5)
     except Exception:
         pass
+
+
+# =========================
+# NORMALIZZAZIONE DEPOSITO
+# =========================
+def normalizza_deposito(deposito):
+    if not isinstance(deposito, dict):
+        return DEFAULT_DEPOSITO.copy()
+
+    # formato nuovo già corretto
+    if "items" in deposito and isinstance(deposito["items"], dict):
+        return {"items": deposito["items"]}
+
+    # formato vecchio: {"foglie": 100, "panetti": 20}
+    items = {
+        k: v for k, v in deposito.items()
+        if isinstance(v, (int, float))
+    }
+
+    return {"items": items}
+
+
+# =========================
+# CARICAMENTO DATI
+# =========================
+def carica_dati():
+    finanze = leggi_file_github(FINANZE_FILE, DEFAULT_FINANZE)
+    deposito = leggi_file_github(DEPOSITO_FILE, DEFAULT_DEPOSITO)
+
+    if not isinstance(finanze, dict):
+        finanze = DEFAULT_FINANZE.copy()
+
+    deposito = normalizza_deposito(deposito)
+
+    st.session_state.finanze = finanze
+    st.session_state.deposito = deposito
+
+
+def aggiorna_dati_da_github():
+    carica_dati()
+
+
+if "finanze" not in st.session_state:
+    st.session_state.finanze = DEFAULT_FINANZE.copy()
+
+if "deposito" not in st.session_state:
+    st.session_state.deposito = DEFAULT_DEPOSITO.copy()
+
+carica_dati()
 
 
 # =========================
@@ -200,9 +234,7 @@ def registra_deposito(nome_articolo, quantita):
         return False
 
     deposito = st.session_state.get("deposito", DEFAULT_DEPOSITO.copy())
-
-    if "items" not in deposito or not isinstance(deposito["items"], dict):
-        deposito["items"] = {}
+    deposito = normalizza_deposito(deposito)
 
     if nome_articolo not in deposito["items"]:
         deposito["items"][nome_articolo] = 0
