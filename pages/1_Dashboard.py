@@ -19,6 +19,7 @@ HEADERS = {
 }
 
 FINANZE_FILE = "data/finanze.json"
+ARMERIA_FILE = "data/armeria.json"
 DEPOSITO_FILE = "data/deposito.json"
 
 # =========================
@@ -86,6 +87,8 @@ def estrai_items_deposito(deposito):
 
     items_puliti = {}
     for k, v in sorgente.items():
+        if k == "movimenti":
+            continue
         valore = converti_valore(v)
         if valore is not None:
             items_puliti[str(k).strip().lower()] = valore
@@ -100,6 +103,13 @@ finanze = leggi_file_github(FINANZE_FILE, {
     "cassa": 0,
     "fondo_cassa": 0,
     "soldi_sporchi": 0,
+    "movimenti": []
+})
+
+armeria = leggi_file_github(ARMERIA_FILE, {
+    "pistola": 0,
+    "silenziatore": 0,
+    "caricatore": 0,
     "movimenti": []
 })
 
@@ -198,6 +208,39 @@ with col3:
     <div class="card">
         <h3>💼 Fondo Cassa</h3>
         <h1>{formatta(finanze.get('fondo_cassa', 0))} $</h1>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.divider()
+
+# =========================
+# GESTIONE ARMERIA
+# =========================
+st.markdown("<div class='section-title'>🪖 Gestione Armeria</div>", unsafe_allow_html=True)
+
+col_arm1, col_arm2, col_arm3 = st.columns(3, gap="large")
+
+with col_arm1:
+    st.markdown(f"""
+    <div class="card">
+        <h3>🔫 Pistola</h3>
+        <h1>{formatta(armeria.get('pistola', 0))}</h1>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col_arm2:
+    st.markdown(f"""
+    <div class="card">
+        <h3>🔇 Silenziatore</h3>
+        <h1>{formatta(armeria.get('silenziatore', 0))}</h1>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col_arm3:
+    st.markdown(f"""
+    <div class="card">
+        <h3>🧱 Caricatore</h3>
+        <h1>{formatta(armeria.get('caricatore', 0))}</h1>
     </div>
     """, unsafe_allow_html=True)
 
