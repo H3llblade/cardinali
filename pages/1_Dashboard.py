@@ -282,7 +282,7 @@ st.divider()
 # DEPOSITO DROGHE
 # =========================
 render_sezione_items(
-    "📦 Deposito Droghe",
+    "🌿 Deposito Droghe",
     drugs,
     "Nessun elemento presente nel deposito droghe."
 )
