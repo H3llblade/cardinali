@@ -68,6 +68,43 @@ def leggi_file_github(file_path, default_data):
         return default_data.copy()
 
 
+def aggiorna_file_github(file_path, dati, messaggio):
+    if not github_ok():
+        st.error("Configurazione GitHub mancante nelle secrets.")
+        return False
+
+    try:
+        url = get_github_api_url(file_path)
+        r = requests.get(url, headers=HEADERS, timeout=15)
+        sha = r.json().get("sha") if r.status_code == 200 else None
+
+        json_str = json.dumps(dati, indent=4, ensure_ascii=False)
+        json_base64 = base64.b64encode(json_str.encode("utf-8")).decode("utf-8")
+
+        payload = {
+            "message": messaggio,
+            "content": json_base64
+        }
+
+        if sha:
+            payload["sha"] = sha
+
+        put_r = requests.put(url, headers=HEADERS, json=payload, timeout=15)
+
+        if put_r.status_code in [200, 201]:
+            return True
+
+        st.error(f"Errore aggiornamento GitHub: {put_r.text}")
+        return False
+
+    except Exception as e:
+        st.error(f"Errore salvataggio GitHub: {e}")
+        return False
+
+
+# -------------------------------
+# FUNZIONI UTILI
+# -------------------------------
 def parse_data(data_str):
     try:
         return datetime.strptime(data_str, "%d/%m/%Y %H:%M:%S")
@@ -85,26 +122,25 @@ def formatta_valore(valore):
         return "0"
 
 
-# -------------------------------
-# LETTURA DATI
-# -------------------------------
-dati_finanze = leggi_file_github(FINANZE_FILE_PATH, DEFAULT_FINANZE)
-dati_armeria = leggi_file_github(ARMERIA_FILE_PATH, DEFAULT_ARMERIA)
+def reset_finanze():
+    dati = {
+        "cassa": 0,
+        "fondo_cassa": 0,
+        "soldi_sporchi": 0,
+        "movimenti": []
+    }
+    return aggiorna_file_github(FINANZE_FILE_PATH, dati, "Reset registro finanze")
 
-mov_finanze = dati_finanze.get("movimenti", [])
-mov_armeria = dati_armeria.get("movimenti", [])
 
-mov_finanze = sorted(
-    mov_finanze,
-    key=lambda x: parse_data(x.get("data", "")),
-    reverse=True
-)
+def reset_armeria():
+    dati = {
+        "pistola": 0,
+        "silenziatore": 0,
+        "caricatore": 0,
+        "movimenti": []
+    }
+    return aggiorna_file_github(ARMERIA_FILE_PATH, dati, "Reset registro armeria")
 
-mov_armeria = sorted(
-    mov_armeria,
-    key=lambda x: parse_data(x.get("data", "")),
-    reverse=True
-)
 
 # -------------------------------
 # HEADER
@@ -119,6 +155,14 @@ col1, col2 = st.columns(2, gap="large")
 # ===============================
 with col1:
     st.subheader("💰 Registro Finanze")
+
+    dati_finanze = leggi_file_github(FINANZE_FILE_PATH, DEFAULT_FINANZE)
+    mov_finanze = dati_finanze.get("movimenti", [])
+    mov_finanze = sorted(
+        mov_finanze,
+        key=lambda x: parse_data(x.get("data", "")),
+        reverse=True
+    )
 
     if mov_finanze:
         for mov in mov_finanze:
@@ -145,11 +189,26 @@ with col1:
     else:
         st.info("Nessun movimento finanziario registrato")
 
+    st.divider()
+
+    if st.button("🗑️ Svuota Registro Finanze", key="reset_finanze_btn", use_container_width=True):
+        if reset_finanze():
+            st.success("Registro finanze svuotato correttamente.")
+            st.rerun()
+
 # ===============================
 # COLONNA DESTRA - ARMERIA
 # ===============================
 with col2:
     st.subheader("🪖 Registro Armeria")
+
+    dati_armeria = leggi_file_github(ARMERIA_FILE_PATH, DEFAULT_ARMERIA)
+    mov_armeria = dati_armeria.get("movimenti", [])
+    mov_armeria = sorted(
+        mov_armeria,
+        key=lambda x: parse_data(x.get("data", "")),
+        reverse=True
+    )
 
     if mov_armeria:
         for mov in mov_armeria:
@@ -162,9 +221,9 @@ with col2:
             if item == "pistola":
                 emoji_item = "🔫"
             elif item == "silenziatore":
-                emoji_item = "🧰"
+                emoji_item = "🔇"
             elif item == "caricatore":
-                emoji_item = "📦"
+                emoji_item = "🧱"
 
             st.markdown(
                 f"<div style='background-color:#2C2C2C;padding:15px;border-radius:10px;margin-bottom:10px;'>"
@@ -178,3 +237,10 @@ with col2:
             )
     else:
         st.info("Nessun movimento armeria registrato")
+
+    st.divider()
+
+    if st.button("🗑️ Svuota Registro Armeria", key="reset_armeria_btn", use_container_width=True):
+        if reset_armeria():
+            st.success("Registro armeria svuotato correttamente.")
+            st.rerun()
