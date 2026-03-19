@@ -1,8 +1,25 @@
 import streamlit as st
 import time
-from gestionale import formatta, aggiorna_dati_da_github
+import requests
+import json
+import base64
 
 st.set_page_config(layout="wide")
+
+# =========================
+# CONFIG GITHUB
+# =========================
+GITHUB_REPO_OWNER = st.secrets["GITHUB_OWNER"]
+GITHUB_REPO_NAME = st.secrets["GITHUB_REPO"]
+GITHUB_TOKEN = st.secrets["GITHUB_PAT"]
+
+HEADERS = {
+    "Authorization": f"token {GITHUB_TOKEN}",
+    "Accept": "application/vnd.github+json"
+}
+
+FINANZE_FILE = "data/finanze.json"
+DEPOSITO_FILE = "data/deposito.json"
 
 # =========================
 # AUTO REFRESH
@@ -15,8 +32,39 @@ if time.time() - st.session_state.last_refresh > 5:
     st.rerun()
 
 # =========================
-# FUNZIONI UTILI
+# FUNZIONI
 # =========================
+def formatta(num):
+    try:
+        n = float(num)
+        if n.is_integer():
+            return f"{int(n):,}".replace(",", ".")
+        return f"{n:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    except Exception:
+        return "0"
+
+
+def leggi_file_github(file_path, default_data):
+    url = f"https://api.github.com/repos/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/contents/{file_path}"
+
+    try:
+        r = requests.get(url, headers=HEADERS, timeout=15)
+
+        if r.status_code == 200:
+            content = r.json()["content"]
+            decoded = base64.b64decode(content).decode("utf-8")
+            dati = json.loads(decoded)
+
+            if isinstance(dati, dict):
+                return dati
+
+        return default_data
+
+    except Exception as e:
+        st.error(f"Errore lettura {file_path}: {e}")
+        return default_data
+
+
 def converti_valore(v):
     if isinstance(v, (int, float)):
         return float(v)
@@ -29,15 +77,12 @@ def converti_valore(v):
 
 
 def estrai_items_deposito(deposito):
-    """
-    Supporta sia:
-    1) {"items": {"foglie": 100}}
-    2) {"foglie": 100}
-    3) valori numerici anche come stringa
-    """
     if not isinstance(deposito, dict):
         return {}
 
+    # Supporta:
+    # {"items": {"foglie": 100}}
+    # {"foglie": 100}
     sorgente = deposito.get("items", deposito)
 
     if not isinstance(sorgente, dict):
@@ -53,12 +98,16 @@ def estrai_items_deposito(deposito):
 
 
 # =========================
-# CARICAMENTO DATI
+# CARICAMENTO DATI DIRETTO
 # =========================
-aggiorna_dati_da_github()
+finanze = leggi_file_github(FINANZE_FILE, {
+    "cassa": 0,
+    "fondo_cassa": 0,
+    "soldi_sporchi": 0,
+    "movimenti": []
+})
 
-finanze = st.session_state.get("finanze", {})
-deposito = st.session_state.get("deposito", {})
+deposito = leggi_file_github(DEPOSITO_FILE, {"items": {}})
 items = estrai_items_deposito(deposito)
 
 # =========================
@@ -177,13 +226,20 @@ if items:
                 else:
                     st.empty()
 else:
-    st.info("Nessun elemento presente nel deposito.")
+    st.warning("Nessun elemento presente nel deposito.")
 
 st.divider()
 
-col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 4])
+col1, col2, col3 = st.columns([1, 1, 4])
 
-with col_btn2:
+with col2:
     if st.button("🔄 Aggiorna ora", use_container_width=True):
-        aggiorna_dati_da_github()
         st.rerun()
+
+with st.expander("Debug deposito"):
+    st.write("Contenuto raw di deposito.json:")
+    st.json(deposito)
+    st.write("Items letti dalla dashboard:")
+    st.json(items)
+    st.write("Path letto:", DEPOSITO_FILE)
+    st.write("Repo letto:", f"{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}")
