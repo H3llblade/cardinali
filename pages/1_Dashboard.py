@@ -17,14 +17,27 @@ finanze = st.session_state.get("finanze", {})
 deposito = st.session_state.get("deposito", {})
 
 items = {}
+
+def converti_valore(v):
+    if isinstance(v, (int, float)):
+        return float(v)
+    if isinstance(v, str):
+        try:
+            return float(v.strip().replace(",", "."))
+        except Exception:
+            return None
+    return None
+
 if isinstance(deposito, dict):
-    raw_items = deposito.get("items", {})
+    raw_items = deposito.get("items", deposito)
+
     if isinstance(raw_items, dict):
-        items = {
-            str(k).strip().lower(): v
-            for k, v in raw_items.items()
-            if isinstance(v, (int, float))
-        }
+        items_puliti = {}
+        for k, v in raw_items.items():
+            valore = converti_valore(v)
+            if valore is not None:
+                items_puliti[str(k).strip().lower()] = valore
+        items = items_puliti
 
 st.markdown("""
 <style>
