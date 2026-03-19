@@ -2,9 +2,6 @@ import streamlit as st
 import time
 from gestionale import formatta, aggiorna_dati_da_github
 
-# =========================
-# CONFIG PAGINA
-# =========================
 st.set_page_config(layout="wide")
 
 # =========================
@@ -23,33 +20,53 @@ if time.time() - st.session_state.last_refresh > 5:
 aggiorna_dati_da_github()
 
 finanze = st.session_state.get("finanze", {})
-coca = st.session_state.get("coca", {})
+deposito = st.session_state.get("deposito", {})
+items = deposito.get("items", {})
 
 # =========================
-# STILE CSS
+# STILE
 # =========================
 st.markdown("""
 <style>
+.block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    max-width: 100%;
+}
+
 .card {
     background-color: #1E1E1E;
     padding: 25px;
     border-radius: 18px;
     text-align: center;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.35);
+    margin-bottom: 18px;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
+
 .card h3 {
-    margin-bottom: 10px;
-    color: #bbbbbb;
+    margin: 0 0 10px 0;
+    color: #CFCFCF;
+    font-size: 20px;
+    font-weight: 600;
 }
+
 .card h1 {
     margin: 0;
-    font-size: 36px;
+    font-size: 34px;
     color: white;
+    font-weight: 800;
 }
+
 .section-title {
-    font-size: 26px;
+    font-size: 28px;
+    font-weight: 700;
     color: white;
-    margin-top: 20px;
+    margin-top: 8px;
+    margin-bottom: 12px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -68,7 +85,6 @@ st.divider()
 # REGISTRO FINANZE
 # =========================
 st.markdown("<div class='section-title'>💰 Registro Finanze</div>", unsafe_allow_html=True)
-st.divider()
 
 col1, col2, col3 = st.columns(3, gap="large")
 
@@ -99,42 +115,37 @@ with col3:
 st.divider()
 
 # =========================
-# PROCESSO COCA
+# DEPOSITO
 # =========================
-st.markdown("<div class='section-title'>🌿 Processo Coca</div>", unsafe_allow_html=True)
-st.divider()
+st.markdown("<div class='section-title'>📦 Deposito</div>", unsafe_allow_html=True)
 
-col4, col5, col6 = st.columns(3, gap="large")
+if items:
+    lista_items = list(items.items())
 
-with col4:
-    st.markdown(f"""
-    <div class="card">
-        <h3>🍃 Foglie</h3>
-        <h1>{formatta(coca.get('foglie', 0))}</h1>
-    </div>
-    """, unsafe_allow_html=True)
+    for i in range(0, len(lista_items), 3):
+        blocco = lista_items[i:i+3]
+        cols = st.columns(3, gap="large")
 
-with col5:
-    st.markdown(f"""
-    <div class="card">
-        <h3>🧱 Panetti</h3>
-        <h1>{formatta(coca.get('panetti', 0))}</h1>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col6:
-    st.markdown(f"""
-    <div class="card">
-        <h3>💊 Bustine</h3>
-        <h1>{formatta(coca.get('bustine', 0))}</h1>
-    </div>
-    """, unsafe_allow_html=True)
+        for j in range(3):
+            with cols[j]:
+                if j < len(blocco):
+                    nome, valore = blocco[j]
+                    st.markdown(f"""
+                    <div class="card">
+                        <h3>{nome.replace("_", " ").title()}</h3>
+                        <h1>{formatta(valore)}</h1>
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.empty()
+else:
+    st.info("Nessun elemento presente nel deposito.")
 
 st.divider()
 
-# =========================
-# REFRESH MANUALE
-# =========================
-if st.button("🔄 Aggiorna ora"):
-    aggiorna_dati_da_github()
-    st.rerun()
+col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 4])
+
+with col_btn2:
+    if st.button("🔄 Aggiorna ora", use_container_width=True):
+        aggiorna_dati_da_github()
+        st.rerun()
