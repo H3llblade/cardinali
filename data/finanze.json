@@ -1,5 +1,5 @@
 {
-    "cassa": 560000.0,
+    "cassa": 460000.0,
     "fondo_cassa": 0,
     "soldi_sporchi": 3730252.0,
     "movimenti": [
@@ -20,6 +20,12 @@
             "tipo": "cassa",
             "causale": "Acquisto 100 caricatori Armeria",
             "valore": -40000.0
+        },
+        {
+            "data": "20/03/2026 20:26:40",
+            "tipo": "cassa",
+            "causale": "Pagamento Alexandrta per Giungla",
+            "valore": -100000.0
         }
     ]
 }
