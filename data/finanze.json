@@ -1,7 +1,7 @@
 {
     "cassa": 0,
     "fondo_cassa": 0,
-    "soldi_sporchi": 634613.0,
+    "soldi_sporchi": 1234613.0,
     "movimenti": [
         {
             "data": "19/03/2026 03:54:26",
@@ -14,6 +14,12 @@
             "tipo": "soldi_sporchi",
             "causale": "rapine",
             "valore": 80696.0
+        },
+        {
+            "data": "20/03/2026 20:03:01",
+            "tipo": "soldi_sporchi",
+            "causale": "Vendita meth",
+            "valore": 600000.0
         }
     ]
 }
