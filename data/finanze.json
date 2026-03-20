@@ -1,5 +1,5 @@
 {
-    "cassa": 600000.0,
+    "cassa": 560000.0,
     "fondo_cassa": 0,
     "soldi_sporchi": 3730252.0,
     "movimenti": [
@@ -14,6 +14,12 @@
             "tipo": "cassa",
             "causale": "Start fondo soldi puliti 20/03/2026",
             "valore": 600000.0
+        },
+        {
+            "data": "20/03/2026 20:14:28",
+            "tipo": "cassa",
+            "causale": "Acquisto 100 caricatori Armeria",
+            "valore": -40000.0
         }
     ]
 }
