@@ -1,31 +1,6 @@
 {
     "cassa": 0,
     "fondo_cassa": 0,
-    "soldi_sporchi": 1387623.0,
-    "movimenti": [
-        {
-            "data": "19/03/2026 03:54:26",
-            "tipo": "soldi_sporchi",
-            "causale": "start 19/03/26  h  05.00",
-            "valore": 553917.0
-        },
-        {
-            "data": "19/03/2026 17:09:51",
-            "tipo": "soldi_sporchi",
-            "causale": "rapine",
-            "valore": 80696.0
-        },
-        {
-            "data": "20/03/2026 20:03:01",
-            "tipo": "soldi_sporchi",
-            "causale": "Vendita meth",
-            "valore": 600000.0
-        },
-        {
-            "data": "20/03/2026 20:03:17",
-            "tipo": "soldi_sporchi",
-            "causale": "Ricettazione",
-            "valore": 153010.0
-        }
-    ]
+    "soldi_sporchi": 0,
+    "movimenti": []
 }
