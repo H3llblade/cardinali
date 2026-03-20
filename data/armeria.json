@@ -1,35 +1,6 @@
 {
-    "pistola": 3.0,
+    "pistola": 0,
     "silenziatore": 0,
-    "caricatore": 106.0,
-    "movimenti": [
-        {
-            "data": "19/03/2026 04:12:49",
-            "tipo": "armeria",
-            "item": "pistola",
-            "causale": "BERETTA  al 19/03/26",
-            "valore": 2.0
-        },
-        {
-            "data": "19/03/2026 04:14:05",
-            "tipo": "armeria",
-            "item": "caricatore",
-            "causale": "+ Caricatori estesi",
-            "valore": 6.0
-        },
-        {
-            "data": "19/03/2026 04:14:44",
-            "tipo": "armeria",
-            "item": "pistola",
-            "causale": "Pistola Sns",
-            "valore": 1.0
-        },
-        {
-            "data": "20/03/2026 20:27:22",
-            "tipo": "armeria",
-            "item": "caricatore",
-            "causale": "Reintegro caricatori Armeria",
-            "valore": 100.0
-        }
-    ]
+    "caricatore": 0,
+    "movimenti": []
 }
