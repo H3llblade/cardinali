@@ -1,5 +1,5 @@
 {
-    "cassa": 0,
+    "cassa": 600000.0,
     "fondo_cassa": 0,
     "soldi_sporchi": 3730252.0,
     "movimenti": [
@@ -8,6 +8,12 @@
             "tipo": "soldi_sporchi",
             "causale": "Start fondo soldi sporchi 20/03",
             "valore": 3730252.0
+        },
+        {
+            "data": "20/03/2026 20:09:59",
+            "tipo": "cassa",
+            "causale": "Start fondo soldi puliti 20/03/2026",
+            "valore": 600000.0
         }
     ]
 }
