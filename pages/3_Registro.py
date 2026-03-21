@@ -122,26 +122,6 @@ def formatta_valore(valore):
         return "0"
 
 
-def reset_finanze():
-    dati = {
-        "cassa": 0,
-        "fondo_cassa": 0,
-        "soldi_sporchi": 0,
-        "movimenti": []
-    }
-    return aggiorna_file_github(FINANZE_FILE_PATH, dati, "Reset registro finanze")
-
-
-def reset_armeria():
-    dati = {
-        "pistola": 0,
-        "silenziatore": 0,
-        "caricatore": 0,
-        "movimenti": []
-    }
-    return aggiorna_file_github(ARMERIA_FILE_PATH, dati, "Reset registro armeria")
-
-
 # -------------------------------
 # HEADER
 # -------------------------------
@@ -191,11 +171,6 @@ with col1:
 
     st.divider()
 
-    if st.button("🗑️ Svuota Registro Finanze", key="reset_finanze_btn", use_container_width=True):
-        if reset_finanze():
-            st.success("Registro finanze svuotato correttamente.")
-            st.rerun()
-
 # ===============================
 # COLONNA DESTRA - ARMERIA
 # ===============================
@@ -239,8 +214,3 @@ with col2:
         st.info("Nessun movimento armeria registrato")
 
     st.divider()
-
-    if st.button("🗑️ Svuota Registro Armeria", key="reset_armeria_btn", use_container_width=True):
-        if reset_armeria():
-            st.success("Registro armeria svuotato correttamente.")
-            st.rerun()
