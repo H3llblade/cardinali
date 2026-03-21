@@ -1,5 +1,5 @@
 {
-    "pistola": 5.0,
+    "pistola": 4.0,
     "silenziatore": 0,
     "caricatore": 0,
     "movimenti": [
@@ -9,6 +9,13 @@
             "item": "pistola",
             "causale": "Acquisto 5 pistole",
             "valore": 5.0
+        },
+        {
+            "data": "21/03/2026 21:42:44",
+            "tipo": "armeria",
+            "item": "pistola",
+            "causale": "Pistola per Will Turner",
+            "valore": -1.0
         }
     ]
 }
