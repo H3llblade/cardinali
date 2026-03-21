@@ -1,7 +1,7 @@
 {
     "cassa": 235000.0,
     "fondo_cassa": 0,
-    "soldi_sporchi": 3877032.0,
+    "soldi_sporchi": 3974804.0,
     "movimenti": [
         {
             "data": "20/03/2026 20:09:42",
@@ -56,6 +56,12 @@
             "tipo": "cassa",
             "causale": "Errore inserimento",
             "valore": -97772.0
+        },
+        {
+            "data": "21/03/2026 14:17:48",
+            "tipo": "soldi_sporchi",
+            "causale": "Ricettazione varia",
+            "valore": 97772.0
         }
     ]
 }
