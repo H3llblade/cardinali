@@ -1,5 +1,5 @@
 {
-    "cassa": 10000.0,
+    "cassa": 360000.0,
     "fondo_cassa": 0,
     "soldi_sporchi": 2174804.0,
     "movimenti": [
@@ -74,6 +74,12 @@
             "tipo": "cassa",
             "causale": "Acquisto 5 pistole",
             "valore": -225000.0
+        },
+        {
+            "data": "21/03/2026 16:40:10",
+            "tipo": "cassa",
+            "causale": "Reset cassa",
+            "valore": 350000.0
         }
     ]
 }
