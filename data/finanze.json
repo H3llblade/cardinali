@@ -1,5 +1,5 @@
 {
-    "cassa": 557772.0,
+    "cassa": 332772.0,
     "fondo_cassa": 0,
     "soldi_sporchi": 3877032.0,
     "movimenti": [
@@ -44,6 +44,12 @@
             "tipo": "cassa",
             "causale": "Ricettazione varia",
             "valore": 97772.0
+        },
+        {
+            "data": "21/03/2026 14:17:00",
+            "tipo": "cassa",
+            "causale": "Acquisto Pistole",
+            "valore": -225000.0
         }
     ]
 }
