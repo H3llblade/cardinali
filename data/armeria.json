@@ -1,5 +1,5 @@
 {
-    "pistola": 4.0,
+    "pistola": 3.0,
     "silenziatore": 0,
     "caricatore": 53.0,
     "movimenti": [
@@ -30,6 +30,13 @@
             "item": "caricatore",
             "causale": "Rifornimento deposito famiglia",
             "valore": -20.0
+        },
+        {
+            "data": "21/03/2026 22:56:00",
+            "tipo": "armeria",
+            "item": "pistola",
+            "causale": "Pistola per Antonio Santino",
+            "valore": -1.0
         }
     ]
 }
