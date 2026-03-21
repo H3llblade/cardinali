@@ -1,7 +1,7 @@
 {
     "cassa": 235000.0,
     "fondo_cassa": 0,
-    "soldi_sporchi": 3974804.0,
+    "soldi_sporchi": 2174804.0,
     "movimenti": [
         {
             "data": "20/03/2026 20:09:42",
@@ -62,6 +62,12 @@
             "tipo": "soldi_sporchi",
             "causale": "Ricettazione varia",
             "valore": 97772.0
+        },
+        {
+            "data": "21/03/2026 16:10:58",
+            "tipo": "soldi_sporchi",
+            "causale": "Acquisto pistole diamantate",
+            "valore": -1800000.0
         }
     ]
 }
