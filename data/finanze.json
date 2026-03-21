@@ -1,7 +1,7 @@
 {
     "cassa": 460000.0,
     "fondo_cassa": 0,
-    "soldi_sporchi": 3650252.0,
+    "soldi_sporchi": 3877032.0,
     "movimenti": [
         {
             "data": "20/03/2026 20:09:42",
@@ -32,6 +32,12 @@
             "tipo": "soldi_sporchi",
             "causale": "Acquisto chiavette trojan",
             "valore": -80000.0
+        },
+        {
+            "data": "21/03/2026 03:15:26",
+            "tipo": "soldi_sporchi",
+            "causale": "Riciclaggio 20/03/2026",
+            "valore": 226780.0
         }
     ]
 }
