@@ -1,6 +1,14 @@
 {
-    "pistola": 0,
+    "pistola": 5.0,
     "silenziatore": 0,
     "caricatore": 0,
-    "movimenti": []
+    "movimenti": [
+        {
+            "data": "21/03/2026 17:58:03",
+            "tipo": "armeria",
+            "item": "pistola",
+            "causale": "Acquisto 5 pistole",
+            "valore": 5.0
+        }
+    ]
 }
