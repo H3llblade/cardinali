@@ -1,7 +1,7 @@
 {
     "pistola": 4.0,
     "silenziatore": 0,
-    "caricatore": 73.0,
+    "caricatore": 53.0,
     "movimenti": [
         {
             "data": "21/03/2026 17:58:03",
@@ -23,6 +23,13 @@
             "item": "caricatore",
             "causale": "Stock magazzino",
             "valore": 73.0
+        },
+        {
+            "data": "21/03/2026 21:43:49",
+            "tipo": "armeria",
+            "item": "caricatore",
+            "causale": "Rifornimento deposito famiglia",
+            "valore": -20.0
         }
     ]
 }
