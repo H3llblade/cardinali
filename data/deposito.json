@@ -18,6 +18,7 @@
         "magnesium": 1500.0,
         "ammonia": 300.0,
         "acetone": 5.0,
-        "etanolo": 4.0
+        "etanolo": 4.0,
+        "vetro": 78.0
     }
 }
