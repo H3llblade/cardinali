@@ -1,5 +1,5 @@
 {
-    "cassa": 460000.0,
+    "cassa": 557772.0,
     "fondo_cassa": 0,
     "soldi_sporchi": 3877032.0,
     "movimenti": [
@@ -38,6 +38,12 @@
             "tipo": "soldi_sporchi",
             "causale": "Riciclaggio 20/03/2026",
             "valore": 226780.0
+        },
+        {
+            "data": "21/03/2026 03:58:09",
+            "tipo": "cassa",
+            "causale": "Ricettazione varia",
+            "valore": 97772.0
         }
     ]
 }
