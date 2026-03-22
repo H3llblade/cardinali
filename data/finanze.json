@@ -1,5 +1,5 @@
 {
-    "cassa": 360000.0,
+    "cassa": 374970.0,
     "fondo_cassa": 0,
     "soldi_sporchi": 3053363.0,
     "movimenti": [
@@ -92,6 +92,12 @@
             "tipo": "soldi_sporchi",
             "causale": "Ricettazione 21/03/2026",
             "valore": 689009.0
+        },
+        {
+            "data": "22/03/2026 02:13:11",
+            "tipo": "cassa",
+            "causale": "Deposito soldi 21/03/2026",
+            "valore": 14970.0
         }
     ]
 }
