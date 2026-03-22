@@ -1,7 +1,7 @@
 {
     "cassa": 360000.0,
     "fondo_cassa": 0,
-    "soldi_sporchi": 2364354.0,
+    "soldi_sporchi": 3053363.0,
     "movimenti": [
         {
             "data": "20/03/2026 20:09:42",
@@ -86,6 +86,12 @@
             "tipo": "soldi_sporchi",
             "causale": "Vendita Peyote",
             "valore": 189550.0
+        },
+        {
+            "data": "22/03/2026 02:12:44",
+            "tipo": "soldi_sporchi",
+            "causale": "Ricettazione 21/03/2026",
+            "valore": 689009.0
         }
     ]
 }
