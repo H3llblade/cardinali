@@ -1,6 +1,6 @@
 {
     "pistola": 3.0,
-    "silenziatore": 0,
+    "silenziatore": 8.0,
     "caricatore": 53.0,
     "movimenti": [
         {
@@ -37,6 +37,13 @@
             "item": "pistola",
             "causale": "Pistola per Antonio Santino",
             "valore": -1.0
+        },
+        {
+            "data": "22/03/2026 18:32:39",
+            "tipo": "armeria",
+            "item": "silenziatore",
+            "causale": "Reset conteggio silenziatori",
+            "valore": 8.0
         }
     ]
 }
