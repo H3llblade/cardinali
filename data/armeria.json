@@ -1,5 +1,5 @@
 {
-    "pistola": 3.0,
+    "pistola": 6.0,
     "silenziatore": 8.0,
     "caricatore": 50.0,
     "movimenti": [
@@ -51,6 +51,13 @@
             "item": "caricatore",
             "causale": "Reintegro deposito salone",
             "valore": -3.0
+        },
+        {
+            "data": "22/03/2026 22:20:55",
+            "tipo": "armeria",
+            "item": "pistola",
+            "causale": "Recupero da assalto campo Peyote",
+            "valore": 3.0
         }
     ]
 }
