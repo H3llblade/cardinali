@@ -1,7 +1,7 @@
 {
     "pistola": 3.0,
     "silenziatore": 8.0,
-    "caricatore": 53.0,
+    "caricatore": 50.0,
     "movimenti": [
         {
             "data": "21/03/2026 17:58:03",
@@ -44,6 +44,13 @@
             "item": "silenziatore",
             "causale": "Reset conteggio silenziatori",
             "valore": 8.0
+        },
+        {
+            "data": "22/03/2026 18:32:54",
+            "tipo": "armeria",
+            "item": "caricatore",
+            "causale": "Reintegro deposito salone",
+            "valore": -3.0
         }
     ]
 }
