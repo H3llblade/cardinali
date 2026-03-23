@@ -1,7 +1,7 @@
 {
     "pistola": 5.0,
     "silenziatore": 7.0,
-    "caricatore": 50.0,
+    "caricatore": 48.0,
     "movimenti": [
         {
             "data": "21/03/2026 17:58:03",
@@ -72,6 +72,13 @@
             "item": "silenziatore",
             "causale": "Silenziatore per Elisa",
             "valore": -1.0
+        },
+        {
+            "data": "23/03/2026 00:35:51",
+            "tipo": "armeria",
+            "item": "caricatore",
+            "causale": "Caricatori per Benny",
+            "valore": -2.0
         }
     ]
 }
