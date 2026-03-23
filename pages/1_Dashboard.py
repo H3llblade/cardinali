@@ -271,7 +271,7 @@ with col_arm2:
 with col_arm3:
     st.markdown(f"""
     <div class="card">
-        <h3>🧱 Caricatore Esteso</h3>
+        <h3>🧱 Caricatore</h3>
         <h1>{formatta(armeria.get('caricatore', 0))}</h1>
     </div>
     """, unsafe_allow_html=True)
