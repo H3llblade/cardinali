@@ -1,5 +1,5 @@
 {
-    "pistola": 5.0,
+    "pistola": 4.0,
     "silenziatore": 7.0,
     "caricatore": 40.0,
     "movimenti": [
@@ -86,6 +86,13 @@
             "item": "caricatore",
             "causale": "Reintegro deposito famiglia",
             "valore": -8.0
+        },
+        {
+            "data": "23/03/2026 17:58:28",
+            "tipo": "armeria",
+            "item": "pistola",
+            "causale": "Pistola per Gianfranco",
+            "valore": -1.0
         }
     ]
 }
