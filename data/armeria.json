@@ -1,6 +1,6 @@
 {
     "pistola": 3.0,
-    "silenziatore": 6.0,
+    "silenziatore": 5.0,
     "caricatore": 40.0,
     "movimenti": [
         {
@@ -106,6 +106,13 @@
             "tipo": "armeria",
             "item": "pistola",
             "causale": "Pistola per Garcia",
+            "valore": -1.0
+        },
+        {
+            "data": "23/03/2026 22:20:15",
+            "tipo": "armeria",
+            "item": "silenziatore",
+            "causale": "Caricatore per Garcia",
             "valore": -1.0
         }
     ]
