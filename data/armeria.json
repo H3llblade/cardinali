@@ -1,6 +1,6 @@
 {
     "pistola": 5.0,
-    "silenziatore": 8.0,
+    "silenziatore": 7.0,
     "caricatore": 50.0,
     "movimenti": [
         {
@@ -64,6 +64,13 @@
             "tipo": "armeria",
             "item": "pistola",
             "causale": "Pistola per Elisa",
+            "valore": -1.0
+        },
+        {
+            "data": "23/03/2026 00:35:39",
+            "tipo": "armeria",
+            "item": "silenziatore",
+            "causale": "Silenziatore per Elisa",
             "valore": -1.0
         }
     ]
