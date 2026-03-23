@@ -1,7 +1,7 @@
 {
     "cassa": 374970.0,
     "fondo_cassa": 0,
-    "soldi_sporchi": 4977224.0,
+    "soldi_sporchi": 5627224.0,
     "movimenti": [
         {
             "data": "20/03/2026 20:09:42",
@@ -110,6 +110,12 @@
             "tipo": "soldi_sporchi",
             "causale": "Ricettazione 22/03/2026",
             "valore": 723861.0
+        },
+        {
+            "data": "23/03/2026 18:48:20",
+            "tipo": "soldi_sporchi",
+            "causale": "Vendita 250 meth",
+            "valore": 650000.0
         }
     ]
 }
