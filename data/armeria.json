@@ -1,5 +1,5 @@
 {
-    "pistola": 6.0,
+    "pistola": 5.0,
     "silenziatore": 8.0,
     "caricatore": 50.0,
     "movimenti": [
@@ -58,6 +58,13 @@
             "item": "pistola",
             "causale": "Recupero da assalto campo Peyote",
             "valore": 3.0
+        },
+        {
+            "data": "23/03/2026 00:35:26",
+            "tipo": "armeria",
+            "item": "pistola",
+            "causale": "Pistola per Elisa",
+            "valore": -1.0
         }
     ]
 }
