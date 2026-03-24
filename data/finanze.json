@@ -1,5 +1,5 @@
 {
-    "cassa": 344970.0,
+    "cassa": 269970.0,
     "fondo_cassa": 0,
     "soldi_sporchi": 5812076.0,
     "movimenti": [
@@ -134,6 +134,12 @@
             "tipo": "soldi_sporchi",
             "causale": "Ricettazione 23/03/2026",
             "valore": 204452.0
+        },
+        {
+            "data": "24/03/2026 13:21:33",
+            "tipo": "cassa",
+            "causale": "acquisto BF4000  Famiglia",
+            "valore": -75000.0
         }
     ]
 }
