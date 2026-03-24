@@ -1,5 +1,5 @@
 {
-    "cassa": 374970.0,
+    "cassa": 344970.0,
     "fondo_cassa": 0,
     "soldi_sporchi": 5607624.0,
     "movimenti": [
@@ -122,6 +122,12 @@
             "tipo": "soldi_sporchi",
             "causale": "Riorganizzazione registro",
             "valore": -19600.0
+        },
+        {
+            "data": "24/03/2026 00:29:08",
+            "tipo": "cassa",
+            "causale": "Pagamento Alexandra acquisto giungla",
+            "valore": -30000.0
         }
     ]
 }
