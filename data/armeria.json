@@ -1,5 +1,5 @@
 {
-    "pistola": 3.0,
+    "pistola": 2.0,
     "silenziatore": 6.0,
     "caricatore": 40.0,
     "movimenti": [
@@ -134,6 +134,13 @@
             "tipo": "armeria",
             "item": "pistola",
             "causale": "pistola per Gianfranco",
+            "valore": -1.0
+        },
+        {
+            "data": "24/03/2026 22:15:18",
+            "tipo": "armeria",
+            "item": "pistola",
+            "causale": "Pistola per will",
             "valore": -1.0
         }
     ]
